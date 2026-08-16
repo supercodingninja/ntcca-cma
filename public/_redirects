@@ -1,0 +1,3 @@
+# SPA fallback — every route serves the app (honeypot routes included: the
+# app itself arms the trap on landing)
+/*    /index.html   200
