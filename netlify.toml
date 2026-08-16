@@ -1,0 +1,11 @@
+# Netlify → praises.team build contract.
+# GitHub (supercodingninja/ntcc-cma) pushes → Netlify runs this → praises.team updates.
+[build]
+  command = "npm ci && npx vite build --outDir dist --emptyOutDir"
+  publish = "dist"
+
+# SPA: every route serves the app.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
