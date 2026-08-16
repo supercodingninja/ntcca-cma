@@ -1,7 +1,8 @@
 # Netlify → praises.team build contract.
-# GitHub (supercodingninja/ntcca-cma) pushes → Netlify runs this → praises.team updates.
+# GitHub pushes → Netlify runs this → praises.team updates.
+
 [build]
-  command = "npm ci && npx vite build --outDir dist --emptyOutDir"
+  command = "npm install && npx vite build --outDir dist --emptyOutDir"
   publish = "dist"
 
 # SPA: every route serves the app.
