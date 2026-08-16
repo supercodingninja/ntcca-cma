@@ -1,5 +1,5 @@
 # Netlify → praises.team build contract.
-# GitHub (supercodingninja/ntcc-cma) pushes → Netlify runs this → praises.team updates.
+# GitHub (supercodingninja/ntcca-cma) pushes → Netlify runs this → praises.team updates.
 [build]
   command = "npm ci && npx vite build --outDir dist --emptyOutDir"
   publish = "dist"
