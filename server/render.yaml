@@ -1,0 +1,14 @@
+# ==========================================================================
+# NTCCA Music App — Notation Converter Service (Render.com Blueprint)
+# One click: render.com → New → Blueprint → point at this repo → Deploy.
+# Free tier works. No credit card.
+# ==========================================================================
+services:
+  - type: web
+    name: ntcc-music-converter
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: MAX_UPLOAD_MB
+        value: "25"
