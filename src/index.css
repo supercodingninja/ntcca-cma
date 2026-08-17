@@ -1,1512 +1,591 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+// Copyright © 2026 Reverend Frederick D. Thomas, Jr. — All Rights Reserved.
+// Unauthorized use is strictly prohibited.
 
-/* ==========================================================================
-   This Area Of Code Is: The SCN design system (gold/purple glassmorphism).
-   Explanation: Design tokens + signature glass components + accessibility
-   themes. Every module of the NTCC Music App reads these variables, so the
-   entire app re-themes from one place (masculine / feminine / unisex sets).
-   In Other Words: The DNA of the look and the GetWell signature feel.
-   ========================================================================== */
+// ==========================================================================
+// This Area Of Code Is: The global stylesheet — glass morphism, menu system,
+// backdrop layers, scroll behavior, and responsive layout.
+// Explanation: This is the ONE CSS file that controls every visual layer of
+// the app. The previous version had conflicting overrides (Phase 16, 16b,
+// 16c, 17, and "Boss's rule" all fighting each other) which made the menu
+// transparent and broke scroll behavior. This version consolidates everything
+// into a single clean hierarchy with explicit z-index stacking.
+// In Other Words: The paint job, the wallpaper, and the furniture placement
+// for the entire sanctuary app — one file, no fights, everything visible.
+// ==========================================================================
 
-@layer base {
-  :root {
-    --gold: #d4af37;
-    --gold-light: #f1d470;
-    --gold-dark: #a8862a;
-    --purple-royal: #7851a9;
-    --purple-deep: #4b0082;
-    --purple-dusk: #2a0a4a;
-    --space: #0a0a0f;
-    --space-card: #12121c;
-    --space-edge: #1e1e2e;
-    --glass-bg: rgba(255, 255, 255, 0.045);
-    --glass-bg-strong: rgba(255, 255, 255, 0.09);
-    --glass-border: rgba(255, 255, 255, 0.12);
-    --text-primary: #f4f1ea;
-    --text-muted: rgba(244, 241, 234, 0.62);
-    --accent: var(--gold);
-    --radius-card: 20px;
-    --font-scale: 1;
+/* -------------------- CSS Custom Properties -------------------- */
+:root {
+  /* The NTCC palette — gold on dark, like the sanctuary */
+  --ntcc-gold: #d4a843;
+  --ntcc-gold-light: #f0d78c;
+  --ntcc-gold-dark: #a67c2e;
+  --ntcc-dark: #0a0a0f;
+  --ntcc-dark-elevated: #12121a;
+  --ntcc-dark-surface: #1a1a24;
+  --ntcc-dark-panel: #22222e;
+  --ntcc-text: #e8e6e1;
+  --ntcc-text-muted: #9a9894;
+  --ntcc-text-dim: #6a6864;
+  --ntcc-danger: #c44;
+  --ntcc-success: #4a4;
 
-    --background: 240 14% 5%;
-    --foreground: 45 30% 94%;
-    --card: 240 18% 9%;
-    --card-foreground: 45 30% 94%;
-    --popover: 240 18% 9%;
-    --popover-foreground: 45 30% 94%;
-    --primary: 46 65% 52%;
-    --primary-foreground: 240 14% 5%;
-    --secondary: 270 40% 22%;
-    --secondary-foreground: 45 30% 94%;
-    --muted: 240 12% 16%;
-    --muted-foreground: 45 10% 65%;
-    --accent-hsl: 270 50% 35%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 12% 18%;
-    --input: 240 12% 18%;
-    --ring: 46 65% 52%;
-    --radius: 0.625rem;
-  }
+  /* Glass morphism tokens — controlled opacity, never see-through */
+  --glass-bg: rgba(18, 18, 26, 0.92);
+  --glass-bg-solid: rgba(18, 18, 26, 0.98);
+  --glass-border: rgba(212, 168, 67, 0.15);
+  --glass-border-strong: rgba(212, 168, 67, 0.35);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
 
-  /* Director theme variants — masculine / feminine / unisex */
-  [data-theme="masculine"] {
-    --accent: #6ea8fe;
-    --glass-bg: rgba(110, 168, 254, 0.06);
-    --glass-border: rgba(110, 168, 254, 0.22);
-  }
-  [data-theme="feminine"] {
-    --accent: #f2a7d8;
-    --glass-bg: rgba(242, 167, 216, 0.07);
-    --glass-border: rgba(242, 167, 216, 0.26);
-  }
-  [data-theme="unisex"] {
-    --accent: var(--gold);
-  }
+  /* Spacing scale */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
 
-  /* Accessibility: high contrast (WCAG AAA target) */
-  [data-contrast="high"] {
-    --text-primary: #ffffff;
-    --text-muted: #e8e8e8;
-    --glass-bg: rgba(0, 0, 0, 0.82);
-    --glass-border: #ffd700;
-    --space: #000000;
-    --accent: #ffd700;
-  }
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "SF Mono", Monaco, "Cascadia Code", monospace;
 
-  html {
-    background: var(--space);
-    color: var(--text-primary);
-    font-size: calc(16px * var(--font-scale));
-    -webkit-font-smoothing: antialiased;
-  }
-  body {
-    /* Transparent so the cinematic photo reel shows through; the solid
-       base color lives on <html> behind the backdrop layer. */
-    background:
-      radial-gradient(1200px 800px at 80% -10%, rgba(75, 0, 130, 0.25), transparent 60%),
-      radial-gradient(1000px 700px at -10% 110%, rgba(212, 175, 55, 0.08), transparent 55%);
-    min-height: 100vh;
-    /* iOS Safari: 100vh includes the URL bar, so content gets cut off at the
-       bottom. dvh (dynamic viewport height) follows what is ACTUALLY visible.
-       100vh stays as the fallback for older browsers. */
-    min-height: 100dvh;
-    color: var(--text-primary);
-  }
-  ::selection { background: rgba(212, 175, 55, 0.35); }
-  :focus-visible {
-    outline: 3px solid var(--accent);
-    outline-offset: 2px;
-    border-radius: 6px;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation-duration: 0.01ms !important;
-      transition-duration: 0.01ms !important;
-    }
-  }
-  [data-motion="reduced"] *, [data-motion="reduced"] *::before, [data-motion="reduced"] *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
+  /* Z-index stack — explicit layers, no guessing */
+  --z-backdrop: -10;
+  --z-content: 10;
+  --z-header: 100;
+  --z-menu: 200;
+  --z-menu-overlay: 250;
+  --z-modal: 300;
+  --z-toast: 400;
+  --z-orb: 500;
 }
 
-@layer components {
-  /* The signature glass card — layered glass, gold sweep on hover,
-     spring compression on tap. The GetWell feel, upgraded. */
-  .glass-card {
-    position: relative;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-card);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.22);
-    overflow: hidden;
-    transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1),
-      border-color 150ms ease, box-shadow 320ms ease;
-  }
-  .glass-card::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(115deg, transparent 30%,
-      rgba(212, 175, 55, 0.14) 48%, rgba(241, 212, 112, 0.22) 50%,
-      rgba(212, 175, 55, 0.14) 52%, transparent 70%);
-    transform: translateX(-120%);
-    transition: transform 600ms ease;
-    pointer-events: none;
-  }
-  .glass-card.interactive:hover, .glass-card.interactive:focus-visible {
-    transform: translateY(-4px) scale(1.015);
-    border-color: color-mix(in srgb, var(--accent) 55%, transparent);
-    box-shadow: 0 14px 44px rgba(0, 0, 0, 0.55),
-      0 0 24px color-mix(in srgb, var(--accent) 28%, transparent),
-      inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  }
-  .glass-card.interactive:hover::before, .glass-card.interactive:focus-visible::before {
-    transform: translateX(120%);
-  }
-  .glass-card.interactive:active {
-    transform: translateY(0) scale(0.975);
-    transition-duration: 150ms;
-  }
-
-  .glass-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.65rem 1.25rem;
-    border-radius: 999px;
-    border: 1px solid var(--glass-border);
-    background: var(--glass-bg-strong);
-    color: var(--text-primary);
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1),
-      border-color 150ms ease, background 150ms ease;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .glass-btn:hover { border-color: color-mix(in srgb, var(--accent) 60%, transparent); }
-  .glass-btn:active { transform: scale(0.94); }
-  .glass-btn.primary {
-    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
-    color: #1a1205;
-    border-color: var(--gold-light);
-  }
-  .glass-btn.danger {
-    background: linear-gradient(135deg, #b91c1c, #7f1d1d);
-    border-color: #ef4444;
-  }
-  .text-accent { color: var(--accent); }
-  .font-display { font-family: Georgia, 'Times New Roman', serif; letter-spacing: 0.02em; }
+/* -------------------- Reset & Base -------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-/* Chord-over-lyrics rendering (ChordPro-lite output) */
-.chord-line { display: flex; flex-wrap: wrap; column-gap: 0.35rem; }
-.chord-word { display: inline-flex; flex-direction: column; }
-.chord-word .chord {
-  color: var(--accent);
-  font-weight: 700;
-  font-size: 0.82em;
-  min-height: 1.1em;
-  white-space: pre;
-}
-.chord-word .lyric { white-space: pre; }
-
-/* UnityLED simulator stage */
-.led-stage { transition: background 900ms ease, box-shadow 900ms ease; }
-
-/* Auto-scroll performance view */
-.song-scroll { scroll-behavior: smooth; }
-
-/* Muted text must read the SCN token, not the scaffold's near-black default */
-@layer utilities {
-  .text-muted { color: var(--text-muted); }
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-
-/* ==========================================================================
-   This Area Of Code Is: The Adoración design DNA + Role universes.
-   Explanation: The login wordmark, gold gradient CTA, status pills, auth
-   inputs, Ken-Burns photo drift, and the three distinct role color
-   gradings (Admin gold / Editor violet / Viewer warm memorial).
-   ========================================================================== */
-
-@layer components {
-  .wordmark-badge {
-    width: 72px; height: 72px; margin: 0 auto 1rem;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 2rem; color: #1a1205;
-    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
-    border-radius: 22px;
-    box-shadow: 0 0 40px rgba(212, 175, 55, 0.45);
-  }
-  .wordmark {
-    font-family: Georgia, 'Times New Roman', serif;
-    /* One line on every screen — the font size flows with the viewport so
-       the full wordmark never wraps. Fallback break keeps "NTCCA" whole. */
-    font-size: clamp(1.35rem, 5.4vw, 4.5rem);
-    white-space: nowrap;
-    font-weight: 800;
-    letter-spacing: 0.02em;
-    background: linear-gradient(180deg, #f7e08a, var(--gold) 60%, var(--gold-dark));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    text-shadow: 0 2px 30px rgba(212, 175, 55, 0.25);
-  }
-  .wordmark-sub {
-    color: var(--text-muted);
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    font-size: 0.72rem;
-    margin-top: 0.4rem;
-  }
-  .cta-gold {
-    display: inline-block;
-    border-radius: 14px;
-    font-weight: 700;
-    color: #241a05;
-    background: linear-gradient(135deg, #f1d470, var(--gold) 45%, var(--gold-dark));
-    border: 1px solid var(--gold-light);
-    box-shadow: 0 6px 24px rgba(212, 175, 55, 0.35), inset 0 1px 0 rgba(255,255,255,0.4);
-    cursor: pointer;
-    transition: transform 180ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 200ms ease;
-  }
-  .cta-gold:hover { box-shadow: 0 10px 34px rgba(212, 175, 55, 0.5), inset 0 1px 0 rgba(255,255,255,0.4); transform: translateY(-2px); }
-  .cta-gold:active { transform: scale(0.97); }
-  .pill {
-    display: inline-flex; align-items: center; gap: 0.4rem;
-    padding: 0.35rem 0.9rem; border-radius: 999px;
-    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;
-    border: 1px solid;
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(12px) saturate(1.2);
-    -webkit-backdrop-filter: blur(12px) saturate(1.2);
-  }
-  .pill-green { color: #4ade80; border-color: rgba(74,222,128,0.55); background: rgba(255,255,255,0.05); }
-  .pill-blue { color: #93c5fd; border-color: rgba(147,197,253,0.55); background: rgba(255,255,255,0.05); }
-  .pill-purple { color: #d8b4fe; border-color: rgba(216,180,254,0.55); background: rgba(255,255,255,0.05); }
-  .auth-input {
-    width: 100%;
-    padding: 0.85rem 1.1rem;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.30);
-    color: var(--text-primary);
-    font-size: 1rem;
-  }
-  .auth-input::placeholder { color: var(--text-muted); }
-  .auth-input:focus { border-color: var(--gold); outline: none; background: rgba(255,255,255,0.08); }
-  .copyright-strip {
-    margin-top: 2.5rem;
-    padding: 0.6rem 1.2rem;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.22);
-    color: var(--gold);
-    font-size: 0.72rem;
-    text-align: center;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
-  }
-  .service-badge {
-    display: inline-flex; align-items: center; gap: 0.3rem;
-    padding: 0.15rem 0.6rem; border-radius: 999px;
-    font-size: 0.7rem; font-weight: 600;
-    border: 1px solid;
-  }
+body {
+  font-family: var(--font-sans);
+  background: var(--ntcc-dark);
+  color: var(--ntcc-text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.5;
 }
 
-/* Ken-Burns drift — the slow cinematic push-in on every photo */
-@keyframes kenburns {
-  from { transform: scale(1) translate(0, 0); }
-  to { transform: scale(1.12) translate(-1.5%, -1%); }
-}
-.kenburns { animation: kenburns 16s ease-in-out infinite alternate; }
-[data-motion="reduced"] .kenburns { animation: none; }
-
-/* ==========================================================================
-   Role universes — the SAME app, seven different souls.
-   Admin = gold command. Editor = violet studio. Viewer = warm memorial.
-   Sound = booth blue. Media = signal cyan. Tempo = metro green.
-   Musician = stage amber.
-   ========================================================================== */
-[data-role="admin"] {
-  --accent: #d4af37;
-  --glass-bg: rgba(212, 175, 55, 0.05);
-  --glass-border: rgba(212, 175, 55, 0.2);
-}
-[data-role="editor"] {
-  --accent: #b79df5;
-  --glass-bg: rgba(150, 110, 240, 0.07);
-  --glass-border: rgba(150, 110, 240, 0.26);
-}
-[data-role="viewer"] {
-  --accent: #e8c9a0;
-  --glass-bg: rgba(232, 201, 160, 0.05);
-  --glass-border: rgba(232, 201, 160, 0.18);
-}
-[data-role="sound"] {
-  --accent: #7fb3ff;
-  --glass-bg: rgba(127, 179, 255, 0.06);
-  --glass-border: rgba(127, 179, 255, 0.24);
-}
-[data-role="media"] {
-  --accent: #6fe0e8;
-  --glass-bg: rgba(111, 224, 232, 0.06);
-  --glass-border: rgba(111, 224, 232, 0.24);
-}
-[data-role="tempo"] {
-  --accent: #8fe6a8;
-  --glass-bg: rgba(143, 230, 168, 0.06);
-  --glass-border: rgba(143, 230, 168, 0.24);
-}
-[data-role="musician"] {
-  --accent: #f0c46f;
-  --glass-bg: rgba(240, 196, 111, 0.06);
-  --glass-border: rgba(240, 196, 111, 0.24);
-}
-
-
-/* ==========================================================================
-   This Area Of Code Is: The density & spacing pass (director feedback).
-   Explanation: Phones were getting crowded nav buttons and uneven card
-   density. These overrides normalize: tighter tab pills, consistent card
-   padding, smaller mobile wordmark margins, and sane form density.
-   ========================================================================== */
-@layer components {
-  /* Tab pills — compact on phones, comfortable on desktop */
-  nav .glass-btn { padding: 0.45rem 0.8rem; }
-  @media (min-width: 640px) {
-    nav .glass-btn { padding: 0.6rem 1.1rem; }
-  }
-
-  /* Density-normalized inputs inside cards */
-  .glass-card .auth-input { padding: 0.6rem 0.9rem; font-size: 0.95rem; }
-  select.auth-input { padding: 0.5rem 0.7rem; }
-
-  /* Tighter hero block on small screens */
-  @media (max-width: 480px) {
-    .wordmark-badge { width: 56px; height: 56px; border-radius: 16px; margin-bottom: 0.6rem; }
-    .wordmark-sub { letter-spacing: 0.2em; }
-  }
-}
-
-/* Consistent vertical rhythm between sections */
-main .space-y-4 > * + * { margin-top: 1rem; }
-
-/* This Area Of Code Is: The glass hover effect (Music Director's Cut spec).
-   Explanation: Options brighten and lift their glass sheen on hover/tap,
-   so every selectable voice and mode feels like backlit glass. */
-.hover-glass { transition: background .18s ease, box-shadow .18s ease, transform .18s ease; }
-.hover-glass:hover, .hover-glass:focus-visible {
-  background: linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.05));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 4px 18px rgba(212,175,55,.25);
-  transform: translateY(-1px);
-}
-
-/* ==========================================================================
-   This Area Of Code Is: Universal Access — panel, toggles, and every
-   accommodation effect (GetWell signature, glass-morphism upgraded).
-   ========================================================================== */
-
-/* The floating glass ♿ button */
-.ua-fab {
-  position: fixed; right: 18px; bottom: 88px; z-index: 70;
-  width: 56px; height: 56px; border-radius: 50%;
-  display: grid; place-items: center; font-size: 26px;
-  background: linear-gradient(135deg, rgba(212,175,55,.35), rgba(75,0,130,.35));
-  backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4);
-  border: 1px solid rgba(212,175,55,.55);
-  box-shadow: 0 6px 24px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.25);
-  transition: transform .2s ease, box-shadow .2s ease;
-}
-.ua-fab:hover, .ua-fab:focus-visible {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 10px 32px rgba(212,175,55,.35), inset 0 1px 0 rgba(255,255,255,.35);
-}
-
-/* The glass control room */
-.ua-overlay {
-  position: fixed; inset: 0; z-index: 80;
-  display: grid; place-items: center; padding: 16px;
-  background: rgba(5,2,12,.72);
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  animation: uaFade .25s ease;
-}
-@keyframes uaFade { from { opacity: 0 } to { opacity: 1 } }
-.ua-panel {
-  width: min(560px, 100%); max-height: 88vh; display: flex; flex-direction: column;
-  border-radius: 24px; padding: 20px;
-  background: linear-gradient(160deg, rgba(30,18,56,.92), rgba(14,8,28,.94));
-  backdrop-filter: blur(24px) saturate(1.5); -webkit-backdrop-filter: blur(24px) saturate(1.5);
-  border: 1px solid rgba(212,175,55,.35);
-  box-shadow: 0 24px 80px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.12);
-  animation: uaRise .3s cubic-bezier(.2,.9,.3,1.2);
-}
-@keyframes uaRise { from { transform: translateY(28px); opacity: 0 } to { transform: none; opacity: 1 } }
-.ua-header { display: flex; align-items: center; gap: 12px; }
-.ua-header-icon { font-size: 26px; }
-.ua-title {
-  flex: 1; text-align: center; font-family: Georgia, 'Times New Roman', serif;
-  color: var(--accent, #d4af37); font-weight: 700; font-size: 1.35rem; letter-spacing: .02em;
-}
-.ua-sub { text-align: center; color: var(--muted, #b8aec9); font-size: .85rem; margin-top: 2px; }
-.ua-body { overflow-y: auto; margin-top: 14px; flex: 1; padding-right: 4px; }
-
-/* Category cards */
-.ua-cat {
-  display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
-  padding: 14px 16px; border-radius: 16px; text-align: left;
-  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12);
-}
-.ua-cat-title {
-  font-family: Georgia, serif; color: var(--accent, #d4af37);
-  font-weight: 700; font-size: .95rem; letter-spacing: .06em;
-}
-.ua-cat-count { color: var(--muted, #b8aec9); font-size: .75rem; }
-
-/* Option rows */
-.ua-row {
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px 14px; margin-bottom: 8px; border-radius: 14px;
-  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
-}
-.ua-row-label { font-size: .9rem; color: #f5f0e6; }
-.ua-row-hint { font-size: .72rem; color: var(--muted, #b8aec9); margin-top: 2px; }
-
-/* iOS-style toggle */
-.ua-switch {
-  flex-shrink: 0; width: 52px; height: 30px; border-radius: 999px;
-  background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.2);
-  position: relative; transition: background .2s ease;
-}
-.ua-switch.on { background: linear-gradient(135deg, #d4af37, #b8860b); border-color: #d4af37; }
-.ua-knob {
-  position: absolute; top: 2px; left: 2px; width: 24px; height: 24px;
-  border-radius: 50%; background: #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,.4);
-  transition: transform .2s cubic-bezier(.2,.9,.3,1.3);
-}
-.ua-switch.on .ua-knob { transform: translateX(22px); }
-
-/* Gold Close bar (GetWell signature) */
-.ua-close {
-  margin-top: 14px; width: 100%; padding: 14px; border-radius: 16px;
-  background: linear-gradient(135deg, #ffd700, #d4af37);
-  color: #1a1005; font-weight: 800; font-size: 1rem; letter-spacing: .02em;
-  box-shadow: 0 6px 20px rgba(212,175,55,.4);
-}
-.ua-close:hover { filter: brightness(1.08); }
-
-/* ---- Accommodation effects ------------------------------------------- */
-
-/* 🧩 Autism-Calm / ⚡ ADHD-Focus: still the reel, mute saturation */
-html[data-calm="on"] body, html[data-focus="on"] body { filter: saturate(.72); }
-html[data-calm="on"] .kenburns, html[data-calm="on"] .kenburns *,
-html[data-noFlash="on"] .kenburns, html[data-noFlash="on"] .kenburns * { animation: none !important; transition: none !important; }
-html[data-focus="on"] .app-backdrop { opacity: .35 !important; }
-
-/* 🎖 PTSD No-Flash: no animations or transitions anywhere */
-html[data-noFlash="on"] *, html[data-noFlash="on"] *::before, html[data-noFlash="on"] *::after {
-  animation: none !important; transition: none !important;
-}
-
-/* ⚖️ Bipolar/Mania steady palette: desaturate the gold arousal */
-html[data-steadyMood="on"] { --accent: #c9b98a !important; }
-html[data-steadyMood="on"] .cta-gold { filter: saturate(.6); }
-
-/* 🌊 Anxiety relief: hide counters/badges that urge */
-html[data-anxietyRelief="on"] .pill, html[data-anxietyRelief="on"] .service-badge { display: none !important; }
-
-/* 🧘 Cognitive load: simplify — hide decoration, one column */
-html[data-lowCognitive="on"] .app-backdrop { opacity: .18 !important; }
-html[data-lowCognitive="on"] .glass-card { box-shadow: none !important; }
-
-/* 📖 Dyslexia-friendly font */
-html[data-dyslexiaFont="on"] body {
-  font-family: 'Comic Sans MS', 'OpenDyslexic', 'Verdana', sans-serif !important;
-  letter-spacing: .08em !important; word-spacing: .16em !important; line-height: 1.8 !important;
-}
-
-/* 🎯 Dyspraxia + Large targets */
-html[data-largeTargets="on"] button, html[data-dyspraxia="on"] button,
-html[data-largeTargets="on"] select, html[data-dyspraxia="on"] select,
-html[data-largeTargets="on"] input, html[data-dyspraxia="on"] input {
-  min-height: 52px !important; font-size: 1.05rem !important;
-}
-html[data-dyspraxia="on"] button { margin: 4px !important; }
-
-/* 🖲 Switch control / ⌨️ keyboard-only: unmissable focus ring */
-html[data-switchControl="on"] *:focus, html[data-keyboardOnly="on"] *:focus {
-  outline: 4px solid #ffd700 !important; outline-offset: 3px !important;
-}
-
-/* 📢 Visual alerts: flash the screen edge when the app sounds */
-@keyframes uaEdgeFlash { 0%,100% { box-shadow: inset 0 0 0 0 transparent } 50% { box-shadow: inset 0 0 60px rgba(255,215,0,.8) } }
-html[data-visualAlerts="on"].ua-sound-flash body { animation: uaEdgeFlash .5s ease; }
-
-/* 👁 Color-vision filters (SVG matrices injected once below) */
-html[data-cvd="deuteranopia"] body { filter: url(#cvd-deuteranopia); }
-html[data-cvd="protanopia"] body { filter: url(#cvd-protanopia); }
-html[data-cvd="tritanopia"] body { filter: url(#cvd-tritanopia); }
-html[data-cvd="achromatopsia"] body { filter: grayscale(1); }
-html[data-cvd="deuteranomaly"] body { filter: url(#cvd-deuteranomaly); }
-html[data-cvd="protanomaly"] body { filter: url(#cvd-protanomaly); }
-html[data-cvd="tritanomaly"] body { filter: url(#cvd-tritanomaly); }
-
-/* ---- Navigation 2.0: compact bar + glass overlay menu ------------------- */
-.nav-shell {
-  display: flex; align-items: center; gap: 6px;
-  overflow: hidden; /* the handshake decides what shows — nothing bleeds */
-}
-/* Icons that didn't fit THIS viewport: out of the flow, still measurable */
-.nav-collapsed {
-  position: absolute !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-/* Compact icon pills so a tablet honestly fits the whole family —
-   on iPad landscape and desktop, MORE simply disappears. */
-.nav-shell .glass-btn { padding: 0.45rem 0.5rem; }
-@media (max-width: 900px) {
-  .nav-shell .glass-btn { padding: 0.4rem 0.45rem; font-size: 13px; }
-  .nav-shell .nav-orb-btn svg, .nav-shell .nav-orb-btn img { width: 34px; height: 34px; }
-}
-.nav-menu-fab {
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
-  min-width: 56px; height: 44px; border-radius: 14px; font-size: 15px; line-height: 1;
-  padding: 4px 8px;
-  background: linear-gradient(135deg, rgba(212,175,55,.16), rgba(75,0,130,.16));
-  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(212,175,55,.5);
-  transition: transform .18s ease, box-shadow .18s ease;
-}
-.nav-menu-word {
-  font-size: 8.5px; font-weight: 800; letter-spacing: 0.16em;
-  color: var(--gold, #d4af37); text-shadow: 0 1px 3px rgba(0,0,0,.5);
-}
-.nav-menu-fab:hover, .nav-menu-fab:focus-visible {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(212,175,55,.3);
-}
-.menu-overlay {
-  position: fixed; inset: 0; z-index: 75;
-  display: flex; flex-direction: column; padding: 18px;
-  background: rgba(5,2,12,.78);
-  backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4);
-  animation: uaFade .22s ease;
-}
-.menu-panel { width: min(720px, 100%); margin: 0 auto; flex: 1; display: flex; flex-direction: column; }
-.menu-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 12px; overflow-y: auto; flex: 1; padding: 6px 2px;
-}
-.menu-tile {
-  display: flex; flex-direction: column; align-items: center; gap: 8px;
-  padding: 22px 10px; border-radius: 18px;
-  background: linear-gradient(160deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
-  border: 1px solid rgba(255,255,255,.14);
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  font-size: .9rem; color: #f5f0e6;
-  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
-}
-.menu-tile:hover, .menu-tile:focus-visible {
-  transform: translateY(-3px);
-  border-color: rgba(212,175,55,.6);
-  box-shadow: 0 10px 28px rgba(212,175,55,.22);
-}
-.menu-tile.active { border-color: var(--accent, #d4af37); box-shadow: 0 0 0 1px var(--accent, #d4af37), 0 8px 24px rgba(212,175,55,.25); }
-.menu-tile .tile-icon { font-size: 30px; }
-
-/* Tiles keep their card shape — no stretched empty rows */
-.menu-grid { grid-auto-rows: minmax(120px, max-content); align-content: start; }
-
-/* ==========================================================================
-   This Area Of Code Is: The twin orbs — accessibility ♿ and language 🌐
-   as jewel-grade glass buttons (GetWell glassmorphism, upgraded).
-   ========================================================================== */
-.ua-fab {
-  position: fixed; right: 18px; bottom: 88px; z-index: 70;
-  width: 60px; height: 60px; border-radius: 50%;
-  display: grid; place-items: center; font-size: 27px;
-  background:
-    radial-gradient(circle at 30% 25%, rgba(255,255,255,.35), transparent 45%),
-    linear-gradient(135deg, rgba(212,175,55,.55), rgba(75,0,130,.55));
-  backdrop-filter: blur(18px) saturate(1.6); -webkit-backdrop-filter: blur(18px) saturate(1.6);
-  border: 1.5px solid rgba(255,215,0,.65);
-  box-shadow:
-    0 8px 28px rgba(0,0,0,.5),
-    0 0 22px rgba(212,175,55,.35),
-    inset 0 1.5px 0 rgba(255,255,255,.4),
-    inset 0 -8px 18px rgba(75,0,130,.35);
-  transition: transform .22s cubic-bezier(.2,.9,.3,1.3), box-shadow .22s ease;
-}
-/* The breathing gold halo */
-.ua-fab::after {
-  content: ''; position: absolute; inset: -7px; border-radius: 50%;
-  border: 2px solid rgba(212,175,55,.45);
-  animation: fabHalo 2.6s ease-in-out infinite;
-  pointer-events: none;
-}
-@keyframes fabHalo {
-  0%, 100% { transform: scale(.92); opacity: .35; }
-  50% { transform: scale(1.08); opacity: .9; }
-}
-.ua-fab:hover, .ua-fab:focus-visible {
-  transform: translateY(-3px) scale(1.08);
-  box-shadow:
-    0 14px 40px rgba(0,0,0,.55),
-    0 0 34px rgba(255,215,0,.55),
-    inset 0 2px 0 rgba(255,255,255,.5);
-}
-.ua-fab:active { transform: scale(.96); }
-
-/* The language orb stacks above the access orb */
-.lang-fab { bottom: 162px; }
-
-/* Language tiles inside the glass panel */
-.lang-tile { padding: 14px 10px !important; gap: 2px !important; }
-.lang-native { font-size: 1rem; font-weight: 700; color: #f5f0e6; }
-.lang-english { font-size: .72rem; color: var(--muted, #b8aec9); }
-
-/* ==========================================================================
-   This Area Of Code Is: The engraving engine's typography (Phase 13) —
-   screen preview + pristine print/PDF output.
-   ========================================================================== */
-.engrave-overlay {
-  position: fixed; inset: 0; z-index: 85; overflow-y: auto;
-  background: rgba(5,2,12,.9); backdrop-filter: blur(8px);
-  padding: 18px; display: flex; flex-direction: column; align-items: center;
-}
-.engrave-toolbar {
-  width: min(860px, 100%); display: flex; align-items: center;
-  justify-content: space-between; gap: 12px; margin-bottom: 14px;
-}
-.engrave-sheet {
-  width: min(860px, 100%); background: #fdfcf8; color: #1a1a1a;
-  border-radius: 10px; padding: 48px 54px;
-  box-shadow: 0 24px 80px rgba(0,0,0,.6);
-  font-family: Georgia, 'Times New Roman', serif;
-}
-.engrave-kicker {
-  text-align: center; font-size: 10px; letter-spacing: .22em;
-  text-transform: uppercase; color: #8a7a4a; margin-bottom: 6px;
-}
-.engrave-title { text-align: center; font-size: 30px; font-weight: 700; letter-spacing: .01em; }
-.engrave-artist { text-align: center; font-size: 15px; color: #444; margin-top: 4px; font-style: italic; }
-.engrave-meta {
-  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 22px;
-  margin-top: 14px; font-size: 12.5px; color: #333;
-}
-.engrave-rule { border: 0; border-top: 2px solid #b8a45a; margin: 16px 0 4px; }
-.engrave-body { column-count: 2; column-gap: 40px; margin-top: 10px; }
-@media (max-width: 700px) { .engrave-body { column-count: 1; } .engrave-sheet { padding: 28px 22px; } }
-.engrave-section { break-inside: avoid; margin-bottom: 18px; }
-.engrave-section-label {
-  font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
-  color: #7a6a35; border-bottom: 1px solid #ddd5b8; margin-bottom: 6px; padding-bottom: 2px;
-}
-.engrave-line { display: flex; flex-wrap: wrap; margin-bottom: 2px; }
-.engrave-seg { display: inline-flex; flex-direction: column; }
-.engrave-chord { font-family: 'Courier New', monospace; font-weight: 700; font-size: 12.5px; color: #2a2a72; min-height: 15px; }
-.engrave-lyric { font-size: 14px; white-space: pre; }
-.engrave-empty { font-style: italic; color: #666; text-align: center; margin: 30px 0; }
-.engrave-foot { margin-top: 24px; border-top: 1px solid #ddd5b8; padding-top: 10px; font-size: 10.5px; color: #555; text-align: center; }
-.engrave-brand { margin-top: 6px; letter-spacing: .12em; text-transform: uppercase; color: #8a7a4a; }
-
-/* Print: the sheet is the ONLY thing on the page */
-@media print {
-  body * { visibility: hidden; }
-  .engrave-sheet, .engrave-sheet * { visibility: visible; }
-  .engrave-sheet {
-    position: absolute; inset: 0; width: 100%; border-radius: 0;
-    box-shadow: none; padding: 40px 48px;
-  }
-  .engrave-body { column-count: 2; }
-}
-
-/* ==========================================================================
-   Phase 15 (v2) — The true axial Earth + both icons inside the login card.
-   The earth rolls left→right on a gentle diagonal axis (never wheel-spins);
-   language + accessibility live as a matched pair of glass orbs in the
-   login card's top-right, exactly where marked. Clean. Award-grade.
-   ========================================================================== */
-
-/* --- The living Earth: a true rotating globe in a glass ring ------------ */
-.earth-orb {
-  display: inline-block;
-  position: relative;
-  flex: none;
-  border-radius: 50%;
+/* Body scroll lock — when menu opens, the page behind freezes */
+body.menu-locked {
   overflow: hidden;
-  background: transparent;       /* NO black — the globe floats free */
-  border: none;                  /* no rim — a circle needs no circle */
-  filter: drop-shadow(0 0 8px rgba(110, 175, 255, 0.55))
-          drop-shadow(0 0 16px rgba(255, 215, 0, 0.22));
-  vertical-align: middle;
-}
-.earth-orb-anim {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  pointer-events: none;
-  user-select: none;
-}
-.earth-orb-still {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: none;
-  pointer-events: none;
-  user-select: none;
-}
-@media (prefers-reduced-motion: reduce) {
-  .earth-orb-anim { display: none; }
-  .earth-orb-still { display: block; }
+  touch-action: none;
 }
 
-/* --- The heading row: welcome left, both icons right — one classy line ---
-   "Welcome Back!" NEVER wraps — the two words stand side by side always */
-.login-head {
+/* -------------------- Backdrop Layer -------------------- */
+/* The cinematic photo/video reel lives here — always behind everything */
+.backdrop-layer {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-backdrop);
+  overflow: hidden;
+}
+
+.backdrop-layer img,
+.backdrop-layer video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 1.6s ease-in-out;
+}
+
+/* The dark vignette that keeps text readable over photos */
+.backdrop-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 20%, transparent 0%, rgba(10,10,15,0.4) 60%, rgba(10,10,15,0.85) 100%),
+    linear-gradient(to bottom, rgba(10,10,15,0.3) 0%, transparent 30%, transparent 70%, rgba(10,10,15,0.6) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* -------------------- App Shell -------------------- */
+#root {
+  position: relative;
+  z-index: var(--z-content);
+  min-height: 100vh;
+}
+
+.app-shell {
+  position: relative;
+  z-index: var(--z-content);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* -------------------- Header / Top Bar -------------------- */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  background: var(--glass-bg-solid);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--glass-border);
+  padding: var(--space-sm) var(--space-md);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 4px;
+  gap: var(--space-md);
 }
-.login-head h2 {
-  white-space: nowrap;
-  font-size: clamp(1.15rem, 5.6vw, 1.5rem);
+
+.app-header h1 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--ntcc-gold);
+  letter-spacing: 0.02em;
 }
-.login-orb-pair {
+
+/* -------------------- Menu System (The Fix) -------------------- */
+/* The menu overlay — opaque, never see-through, always on top */
+.menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-menu-overlay);
+  background: rgba(10, 10, 15, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 4rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.menu-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* The menu grid — scrollable, but NEVER bleeds to body */
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  max-width: 640px;
+  width: 100%;
+  max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;           /* ← FIX: scroll hijacking stopped */
+  touch-action: pan-y;                    /* ← FIX: mobile scroll contained */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Each menu tile — SOLID background, not transparent glass */
+.menu-tile {
+  background: var(--ntcc-dark-panel);     /* ← FIX: was rgba(255,255,255,0.08) */
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: var(--space-lg) var(--space-md);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.menu-tile:hover,
+.menu-tile:focus {
+  background: var(--ntcc-dark-surface);
+  border-color: var(--glass-border-strong);
+  transform: translateY(-2px);
+  box-shadow: var(--glass-shadow);
+}
+
+.menu-tile:active {
+  transform: translateY(0);
+}
+
+.menu-tile .tile-icon {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.menu-tile .tile-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--ntcc-text);
+}
+
+/* Active ring — gold halo on the current section */
+.menu-tile.active {
+  border-color: var(--ntcc-gold);
+  box-shadow: 0 0 0 2px rgba(212, 168, 67, 0.25), var(--glass-shadow);
+}
+
+/* -------------------- Menu Trigger Button -------------------- */
+.menu-trigger {
+  position: fixed;
+  bottom: var(--space-xl);
+  right: var(--space-xl);
+  z-index: var(--z-menu);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--ntcc-gold);
+  color: var(--ntcc-dark);
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex: none;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(212, 168, 67, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.login-orb {
-  width: 66px;
-  height: 66px;
-  border-radius: 50%;
+
+.menu-trigger:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 24px rgba(212, 168, 67, 0.5);
+}
+
+.menu-trigger:active {
+  transform: scale(0.95);
+}
+
+/* -------------------- Glass Cards -------------------- */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: var(--space-lg);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-card-solid {
+  background: var(--glass-bg-solid);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: var(--space-lg);
+  box-shadow: var(--glass-shadow);
+}
+
+/* -------------------- Forms & Inputs -------------------- */
+input, textarea, select {
+  font-family: inherit;
+  font-size: 1rem;
+  background: var(--ntcc-dark-elevated);
+  color: var(--ntcc-text);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  padding: var(--space-sm) var(--space-md);
+  width: 100%;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--ntcc-gold);
+  box-shadow: 0 0 0 3px rgba(212, 168, 67, 0.15);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--ntcc-text-dim);
+}
+
+label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ntcc-text-muted);
+  margin-bottom: var(--space-xs);
+}
+
+/* -------------------- Buttons -------------------- */
+.btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.06);
-  border: none; /* no ring — the icons speak for themselves */
-  box-shadow: none;
-  cursor: pointer;
-  animation: orbPulse 2.8s ease-in-out infinite;
-  transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-@keyframes orbPulse {
-  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.25)); }
-  50%      { transform: scale(1.06); filter: drop-shadow(0 0 14px rgba(255, 240, 200, 0.55)); }
-}
-.login-orb:hover, .login-orb:focus-visible {
-  transform: translateY(-2px) scale(1.1);
-  animation-play-state: paused;
-  filter: drop-shadow(0 0 18px rgba(255, 240, 200, 0.75));
-  outline: none;
-}
-.login-orb:active { transform: scale(0.94); }
-html[data-noFlash="on"] .login-orb,
-html[data-calm="on"] .login-orb { animation: none; }
-@media (prefers-reduced-motion: reduce) {
-  .login-orb { animation: none; }
-}
-.login-orb-a11y {
-  font-size: 22px;
-  line-height: 1;
-  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.6));
-}
-
-/* The bigger accessibility orb — it carries the curved ACCESSIBILITY
-   lettering, so it leads the pair */
-.login-orb-big { width: 66px; height: 66px; }
-
-/* The earth orb + the languages that speak from their continents */
-.login-orb-col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-.earth-stage { position: relative; z-index: 1; }
-
-/* Speaking bubbles — each rises from its continent on the globe, tail
-   pointing home, z-index 1 as commanded. Clean glass, NO frost. */
-.lang-bubble {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: 1;
-  transform: translate(calc(-50% + var(--bx, 0%)), calc(-50% + var(--by, 0%)));
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  color: #fff;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
-  background: rgba(255, 255, 255, 0.10);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 12px;
-  padding: 3px 10px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  white-space: nowrap;
-  pointer-events: none;
-  animation: bubbleSpeak 2.4s cubic-bezier(0.34, 1.4, 0.64, 1) both;
-}
-/* The little ARROW tail — a true speech-bubble pointer, always aimed
-   back at the globe's heart (border-triangle construction) */
-.lang-bubble::after {
-  content: "";
-  position: absolute;
-  width: 0; height: 0;
-  border: 6px solid transparent;
-}
-.lang-bubble.tail-l::after { left: -11px; top: 50%; translate: 0 -50%; border-right: 10px solid rgba(255, 255, 255, 0.62); border-left: 0; }
-.lang-bubble.tail-r::after { right: -11px; top: 50%; translate: 0 -50%; border-left: 10px solid rgba(255, 255, 255, 0.62); border-right: 0; }
-.lang-bubble.tail-t::after { top: -11px; left: 50%; translate: -50% 0; border-bottom: 10px solid rgba(255, 255, 255, 0.62); border-top: 0; }
-.lang-bubble.tail-b::after { bottom: -11px; left: 50%; translate: -50% 0; border-top: 10px solid rgba(255, 255, 255, 0.62); border-bottom: 0; }
-@keyframes bubbleSpeak {
-  0%   { opacity: 0; scale: 0.4; }
-  14%  { opacity: 1; scale: 1.06; }
-  22%  { scale: 1; }
-  82%  { opacity: 1; scale: 1; }
-  100% { opacity: 0; scale: 0.85; }
-}
-html[data-noFlash="on"] .lang-bubble,
-html[data-calm="on"] .lang-bubble { animation: none; opacity: 1; scale: 1; }
-@media (prefers-reduced-motion: reduce) {
-  .lang-bubble { animation: none; opacity: 1; scale: 1; }
-}
-
-/* On the login screen both icons live in the card — the corner orbs rest */
-body[data-screen="login"] .ua-fab,
-body[data-screen="login"] .lang-fab { display: none !important; }
-
-/* --- GetWell-grade landing glass: 100% translucent ------------------------
-   A pane of light — the photo lives INSIDE the card; only the outline,
-   the shine, and the frost tell you the glass is there */
-.login-glass {
-  background: linear-gradient(155deg,
-    rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03) 45%,
-    rgba(255, 255, 255, 0.015)) !important;
-  backdrop-filter: blur(14px) saturate(1.25) brightness(1.12) !important;
-  -webkit-backdrop-filter: blur(14px) saturate(1.25) brightness(1.12) !important;
-  border: 1px solid rgba(255, 255, 255, 0.42) !important;
-  box-shadow:
-    0 12px 40px rgba(0, 0, 0, 0.22),
-    0 0 40px rgba(212, 175, 55, 0.10),
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.55),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.12) !important;
-}
-/* The static shine — a soft daylight gloss swept across the glass */
-.login-glass::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(115deg, rgba(255, 255, 255, 0.16) 0%,
-    rgba(255, 255, 255, 0.05) 28%, transparent 46%);
-  pointer-events: none;
-  z-index: 0;
-}
-.login-glass > *:not(.login-orb-pair) { position: relative; z-index: 1; }
-.login-glass > .login-orb-pair { z-index: 4; }
-.login-glass h2, .login-glass p { text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6); }
-
-/* ==========================================================================
-   Phase 16 — NOTHING IS FROSTED. The purest glass-pane look: every card,
-   pill, input, orb and strip is a clean, clear pane — transparency, a
-   luminous edge, a daylight shine. No milk, no haze, no frost. Ever.
-   ========================================================================== */
-.login-glass,
-.login-orb,
-.pill,
-.auth-input,
-.copyright-strip,
-.nav-menu-fab,
-.glass-btn,
-.menu-tile {
-  backdrop-filter: blur(3px) saturate(1.15) !important;
-  -webkit-backdrop-filter: blur(3px) saturate(1.15) !important;
-}
-
-/* ==========================================================================
-   Phase 16b — TOTAL DE-FROST. Not one blurred pane remains: the floating
-   orbs, the Universal Access control room, the language panel, the section
-   menu, the engraving stage — every surface is clean, clear glass.
-   ========================================================================== */
-.ua-fab, .lang-fab,
-.ua-panel, .ua-overlay,
-.menu-overlay, .menu-tile,
-.login-glass,
-.engrave-overlay {
-  backdrop-filter: blur(3px) saturate(1.15) !important;
-  -webkit-backdrop-filter: blur(3px) saturate(1.15) !important;
-}
-/* Panels go from dark slabs to true translucent panes */
-.ua-panel {
-  background: linear-gradient(160deg, rgba(30, 18, 56, 0.55), rgba(14, 8, 28, 0.6)) !important;
-  border: 1px solid rgba(255, 255, 255, 0.28) !important;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45), inset 0 1.5px 0 rgba(255, 255, 255, 0.35) !important;
-}
-.ua-overlay { background: rgba(5, 2, 12, 0.55) !important; }
-.menu-overlay { background: rgba(5, 2, 12, 0.6) !important; }
-
-/* ==========================================================================
-   Phase 16c — NO FROST. PERIOD. Not 24px, not 3px — NONE. Every pane in
-   the app is pure transparency + luminous edge + shine. Final override;
-   this rule wins over every earlier frost rule in the file.
-   ========================================================================== */
-.glass-card, .glass-btn, .pill, .auth-input, .copyright-strip,
-.login-glass, .login-orb, .login-lang-pill,
-.ua-fab, .lang-fab, .ua-panel, .ua-overlay, .ua-cat, .ua-row,
-.menu-overlay, .menu-tile, .nav-menu-fab,
-.engrave-overlay, .lang-bubble {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-/* Readability without frost: a touch more body in the clear panes */
-/* --- GetWell-grade landing glass: 100% translucent ------------------------
-   A pane of light that FILLS its space — tall, calm, centered */
-.login-glass {
-  background: linear-gradient(155deg,
-    rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.06) 45%,
-    rgba(255, 255, 255, 0.03)) !important;
-  min-height: min(74vh, 780px);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-}
-.glass-card { background: rgba(255, 255, 255, 0.07); }
-.ua-panel {
-  background: linear-gradient(160deg, rgba(30, 18, 56, 0.72), rgba(14, 8, 28, 0.75)) !important;
-}
-
-/* ==========================================================================
-   Phase 17 — KRYSTAL. Bougie-house crystal: so clear you fear to touch it.
-   Nearly invisible panes, hairline diamond rims, one breath of daylight.
-   ========================================================================== */
-.login-glass {
-  background: linear-gradient(155deg,
-    rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025) 45%,
-    rgba(255, 255, 255, 0.012)) !important;
-  border: 1px solid rgba(255, 255, 255, 0.52) !important;
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.20),
-    0 0 46px rgba(255, 215, 0, 0.08),
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.75),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.18),
-    inset 1px 0 0 rgba(255, 255, 255, 0.10),
-    inset -1px 0 0 rgba(255, 255, 255, 0.06) !important;
-}
-/* The single breath of daylight across the crystal */
-.login-glass::after {
-  background: linear-gradient(112deg, rgba(255, 255, 255, 0.20) 0%,
-    rgba(255, 255, 255, 0.06) 26%, transparent 42%);
-}
-.glass-card { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.30); }
-.pill { background: rgba(255, 255, 255, 0.04); }
-.auth-input {
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(255, 255, 255, 0.42);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
-}
-.auth-input:focus { background: rgba(255, 255, 255, 0.06); }
-.copyright-strip { background: rgba(255, 255, 255, 0.04); border-color: rgba(255, 255, 255, 0.28); }
-/* Crystal bubbles — praise in every script, invitation in every tongue */
-.lang-bubble {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.62);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.55);
-  font-size: 11.5px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-  padding: 5px 12px;
-  line-height: 1.25;
-}
-.lang-bubble-praise { font-weight: 800; }
-.lang-bubble-click {
-  font-size: 9px;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: 10px;
+  font-size: 0.9375rem;
   font-weight: 600;
-  color: #ffe9a8;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-  letter-spacing: 0.04em;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
-.lang-bubble::after {
+
+.btn-primary {
+  background: var(--ntcc-gold);
+  color: var(--ntcc-dark);
+}
+
+.btn-primary:hover {
+  background: var(--ntcc-gold-light);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--ntcc-gold);
+  border: 1px solid var(--ntcc-gold);
+}
+
+.btn-secondary:hover {
+  background: rgba(212, 168, 67, 0.1);
+}
+
+.btn-danger {
+  background: var(--ntcc-danger);
+  color: white;
+}
+
+.btn-sm {
+  padding: var(--space-xs) var(--space-sm);
+  font-size: 0.8125rem;
+  border-radius: 6px;
+}
+
+/* -------------------- Login Screen -------------------- */
+.login-screen {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+}
+
+.login-card {
+  position: relative;
+  z-index: var(--z-content);
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+}
+
+.login-card .brand {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--ntcc-gold);
+  margin-bottom: var(--space-xs);
+}
+
+.login-card .subtitle {
+  font-size: 0.9375rem;
+  color: var(--ntcc-text-muted);
+  margin-bottom: var(--space-xl);
+}
+
+.church-select {
+  width: 100%;
+  margin-bottom: var(--space-lg);
+}
+
+/* -------------------- Section Containers -------------------- */
+.section-container {
+  padding: var(--space-lg);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.section-header h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ntcc-gold);
+}
+
+/* -------------------- Song Cards -------------------- */
+.song-card {
+  background: var(--ntcc-dark-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: var(--space-md);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.song-card:hover {
+  border-color: var(--glass-border-strong);
+  transform: translateY(-2px);
+  box-shadow: var(--glass-shadow);
+}
+
+.song-card .song-title {
+  font-weight: 600;
+  color: var(--ntcc-text);
+  margin-bottom: var(--space-xs);
+}
+
+.song-card .song-meta {
+  font-size: 0.8125rem;
+  color: var(--ntcc-text-muted);
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.song-card .song-tags {
+  display: flex;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.tag {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(212, 168, 67, 0.12);
+  color: var(--ntcc-gold);
+}
+
+.tag-choir {
+  background: rgba(68, 170, 68, 0.15);
+  color: var(--ntcc-success);
+}
+
+/* -------------------- Scrollbars -------------------- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
   background: transparent;
 }
 
-/* ==========================================================================
-   Phase 18 — The Living Emblem. The ♪ note rests in gold, then turns on a
-   heavenly axis and BECOMES the dove over the Bible — a gold light-burst
-   marking the holy exchange — then returns. 9-second liturgy, forever.
-   ========================================================================== */
-.brand-morph {
-  position: relative;
-  overflow: visible;
-  perspective: 600px;
+::-webkit-scrollbar-thumb {
+  background: rgba(212, 168, 67, 0.25);
+  border-radius: 3px;
 }
-.brand-face {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 168, 67, 0.4);
 }
-.brand-note {
-  font-size: 2rem;
-  color: #1a1205;
-  animation: noteTurn 9s cubic-bezier(0.68, 0, 0.27, 1) infinite;
-}
-.brand-dove {
-  width: 82%;
-  height: 82%;
-  object-fit: contain;
-  opacity: 0;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
-  animation: doveTurn 9s cubic-bezier(0.68, 0, 0.27, 1) infinite;
-}
-.brand-flash {
-  position: absolute;
-  inset: -30%;
+
+/* -------------------- Accessibility Orbs -------------------- */
+.orb {
+  position: fixed;
+  z-index: var(--z-orb);
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 235, 170, 0.9), rgba(255, 215, 0, 0.35) 45%, transparent 70%);
-  opacity: 0;
-  pointer-events: none;
-  animation: flashBurst 9s ease-in-out infinite;
-}
-/* STRICT metamorphosis: the note departs FIRST, light bursts, THEN the
-   dove arrives. The two are never on stage at the same moment. */
-@keyframes noteTurn {
-  0%, 40%   { opacity: 1; transform: rotateY(0deg) scale(1); }
-  46%, 92%  { opacity: 0; transform: rotateY(100deg) scale(0.55); }
-  97%, 100% { opacity: 1; transform: rotateY(360deg) scale(1); }
-}
-@keyframes doveTurn {
-  0%, 50%   { opacity: 0; transform: rotateY(-100deg) scale(0.55); }
-  56%, 84%  { opacity: 1; transform: rotateY(0deg) scale(1); }
-  90%, 100% { opacity: 0; transform: rotateY(100deg) scale(0.55); }
-}
-@keyframes flashBurst {
-  0%, 46%, 52%, 88%, 94%, 100% { opacity: 0; transform: scale(0.6); }
-  49%  { opacity: 0.9; transform: scale(1.15); }
-  91%  { opacity: 0.85; transform: scale(1.1); }
-}
-html[data-noFlash="on"] .brand-note,
-html[data-noFlash="on"] .brand-dove,
-html[data-noFlash="on"] .brand-flash,
-html[data-calm="on"] .brand-note,
-html[data-calm="on"] .brand-dove,
-html[data-calm="on"] .brand-flash { animation: none; }
-html[data-noFlash="on"] .brand-dove,
-html[data-calm="on"] .brand-dove { opacity: 0; }
-@media (prefers-reduced-motion: reduce) {
-  .brand-note, .brand-dove, .brand-flash { animation: none; }
-  .brand-dove { opacity: 0; }
-}
-
-/* ==========================================================================
-   Phase 18b — The Flying Dove. A white dove, wing-flapping, gliding,
-   banking — crossing the viewport on a wandering bird path, with a
-   heavenly glow so it reads over any photo. Pure motion, zero clicks.
-   ========================================================================== */
-.flying-dove {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 90;
-  width: 84px;
-  pointer-events: none;
-  will-change: transform, opacity;
-  filter:
-    drop-shadow(0 0 10px rgba(255, 240, 200, 0.95))
-    drop-shadow(0 0 26px rgba(255, 215, 0, 0.5));
-}
-.flying-dove img {
-  width: 100%;
-  height: auto;
-  display: block;
-  transform-origin: 50% 40%;
-  animation: doveFlap 0.3s ease-in-out infinite alternate;
-}
-@keyframes doveFlap {
-  from { transform: scaleY(1); }
-  to   { transform: scaleY(0.5); }
-}
-
-/* ==========================================================================
-   Phase 19 — GetWell lettering. Playfair Display for the words that matter,
-   Dancing Script for the blessings — the landing speaks with elegance.
-   ========================================================================== */
-.wordmark, .login-glass h2 {
-  font-family: 'Playfair Display', Georgia, serif !important;
-  letter-spacing: 0.01em;
-}
-
-/* ==========================================================================
-   Phase 20 — The Four-Act Emblem + the Fabulous-Everywhere landing.
-   Dancing golden notes → black dove (no box!) → WHITE dove → flight.
-   Top bar: orb left, emblem center, orb right. Every viewport, fabulous.
-   ========================================================================== */
-
-/* --- The landing top bar: left / center / right, always composed -------- */
-.landing-root { justify-content: flex-start; padding-top: clamp(14px, 3vh, 34px); gap: 0; }
-.landing-topbar {
-  width: 100%;
-  max-width: 720px;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  min-height: clamp(72px, 18vw, 104px); /* the row's height is RESERVED — nothing ever overlaps */
-  margin-bottom: clamp(4px, 1.2vh, 12px);
-  position: relative;
-  z-index: 2;
-}
-.landing-corner-l { justify-self: start; }
-.landing-corner-r { justify-self: end; }
-.landing-corner-l .login-orb, .landing-corner-r .login-orb { flex: none; }
-
-/* The emblem scales with the viewport — phone to tablet to cinema */
-.brand-emblem {
-  width: clamp(64px, 16vw, 96px);
-  height: clamp(64px, 16vw, 96px);
-  position: relative;
-  margin: 0 !important; /* the base badge's auto-margins must not push us off-grid */
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  overflow: visible !important;
-  justify-self: center;
-}
-.brand-emblem > * { position: absolute; inset: 0; }
-
-/* The emblem — HIS picture, layered with its dove-erased twin */
-.em-shield {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  opacity: 0;
-  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.4));
-}
-
-/* REST — the black dove over the Bible, simply resting */
-.brand-emblem[data-phase="rest"] .em-black {
-  opacity: 1;
-  transform: scale(1);
-  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.4)) blur(0px) brightness(1);
-  transition: opacity 700ms ease, transform 700ms ease, filter 700ms ease;
-}
-
-/* ERASE — the black dove dissolves OUT of the photo (content-aware style):
-   it blurs, brightens toward light, and lifts a touch as it vanishes,
-   while the erased photo is already waiting beneath. Simultaneously the
-   WHITE dove (FlyingDove) appears at this spot and flies away. */
-.brand-emblem[data-phase="erase"] .em-bible { opacity: 1; transition: opacity 200ms ease; }
-.brand-emblem[data-phase="erase"] .em-black {
-  opacity: 0;
-  transform: scale(1.06) translateY(-4px);
-  filter: drop-shadow(0 0 18px rgba(255, 252, 240, 0.9)) blur(3px) brightness(2.4);
-  transition: opacity 1.2s ease, transform 1.2s ease, filter 1.2s ease;
-}
-
-/* GONE — only the open Bible remains, holding quietly until the dove returns */
-.brand-emblem[data-phase="gone"] .em-bible { opacity: 1; transition: opacity 300ms ease; }
-.brand-emblem[data-phase="gone"] .em-black {
-  opacity: 0;
-  transition: none; /* it will reappear fresh on the next rest */
-}
-
-/* --- Fabulous at every width -------------------------------------------- */
-@media (min-width: 768px) {
-  .login-glass { max-width: 30rem !important; padding: 2.6rem 3rem !important; }
-  .wordmark { font-size: clamp(2rem, 4.6vw, 2.9rem); }
-  .login-orb { width: 72px; height: 72px; }
-}
-@media (max-height: 640px) {
-  .login-glass { min-height: 0 !important; }
-}
-
-/* ==========================================================================
-   Phase 21 — The score reader: full-viewport stage + pinch zoom controls.
-   ========================================================================== */
-.pdf-stage {
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 14px;
-  overflow: hidden;
-  background: rgba(0, 0, 0, 0.35);
-}
-.pdf-full {
-  position: fixed;
-  inset: 0;
-  z-index: 95;
-  border-radius: 0;
-  display: flex;
-  flex-direction: column;
-  background: rgba(8, 6, 14, 0.97);
-}
-.pdf-bar {
+  background: var(--glass-bg-solid);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border-strong);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 6px 10px;
-  background: rgba(255, 255, 255, 0.06);
-  flex-wrap: wrap;
-}
-.pdf-title { font-size: 0.8rem; font-weight: 700; color: #f5e6b8; }
-.pdf-controls { display: inline-flex; align-items: center; gap: 6px; }
-.pdf-controls button {
-  min-width: 36px; height: 36px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff; font-size: 1.05rem; font-weight: 700;
-  cursor: pointer;
-}
-.pdf-controls button:disabled { opacity: 0.35; cursor: default; }
-.pdf-zoom { font-size: 0.75rem; color: rgba(255, 255, 255, 0.85); min-width: 42px; text-align: center; }
-.pdf-canvas-wrap {
-  overflow: auto;
-  display: flex;
   justify-content: center;
-  align-items: flex-start;
-  max-height: 70vh;
-  padding: 4px;
-}
-.pdf-full .pdf-canvas-wrap { flex: 1; max-height: none; align-items: center; }
-.pdf-canvas-wrap canvas { background: #fff; border-radius: 4px; flex: none; }
-
-/* ==========================================================================
-   Phase 22 — Band Parts: the director's auto-transposer strip.
-   ========================================================================== */
-.band-parts {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.14);
-}
-.band-parts-label { font-size: 0.82rem; font-weight: 700; color: var(--gold, #d4af37); }
-.band-part {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  background: rgba(255, 255, 255, 0.06);
-  color: #fff;
+  font-size: 1.25rem;
   cursor: pointer;
-  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
-}
-.band-part:hover { transform: translateY(-1px); border-color: rgba(255, 215, 0, 0.6); }
-.band-part.on {
-  background: rgba(212, 175, 55, 0.22);
-  border-color: rgba(255, 215, 0, 0.85);
-  box-shadow: 0 0 12px rgba(255, 215, 0, 0.25);
-}
-.band-part-name { font-size: 0.78rem; font-weight: 600; }
-.band-part-key { font-size: 0.85rem; font-weight: 800; color: var(--gold, #d4af37); }
-
-/* ==========================================================================
-   Phase 23 — LIQUID GLASS (no frost, ever). The awwwards recipe, zero
-   blur: a gradient liquid rim (bright crown, glass-water sides), an
-   inner bevel, a refraction highlight where light bends at the corner,
-   and fluid morph transitions between views.
-   ========================================================================== */
-
-/* The liquid rim — a gradient stroke drawn around the pane: brilliant at
-   the crown, watery at the sides, glowing at the base */
-.login-glass::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1.5px;
-  background: linear-gradient(165deg,
-    rgba(255, 255, 255, 0.85) 0%,
-    rgba(255, 255, 255, 0.25) 22%,
-    rgba(255, 255, 255, 0.06) 45%,
-    rgba(160, 200, 255, 0.22) 72%,
-    rgba(255, 235, 170, 0.38) 100%);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-  z-index: 2;
-}
-/* The inner bevel + refraction pool — light gathers at the top-left
-   corner like sun through real glass */
-.login-glass {
-  box-shadow:
-    0 24px 60px rgba(0, 0, 0, 0.22),
-    0 0 46px rgba(255, 215, 0, 0.07),
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.6),
-    inset 1px 0 0 rgba(255, 255, 255, 0.22),
-    inset -1px 0 0 rgba(255, 255, 255, 0.08),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.15) !important;
-}
-.glass-card::after {
-  content: "";
-  position: absolute;
-  top: 0; left: 0;
-  width: 55%; height: 38%;
-  background: radial-gradient(ellipse at 20% 15%,
-    rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.05) 45%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-  border-top-left-radius: inherit;
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s ease;
 }
 
-/* Fluid view morphing — every section rises and settles like liquid
-   finding its level (SwiftUI-style transition, zero libraries) */
-main > section, .app-section, .section-shell {
-  animation: liquidIn 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+.orb:hover {
+  transform: scale(1.1);
+  border-color: var(--ntcc-gold);
+  box-shadow: 0 0 16px rgba(212, 168, 67, 0.3);
 }
-@keyframes liquidIn {
-  from { opacity: 0; transform: translateY(14px) scale(0.985); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+
+.orb-access {
+  bottom: var(--space-xl);
+  left: var(--space-xl);
 }
-html[data-noFlash="on"] main > section,
-html[data-calm="on"] main > section { animation: none; }
+
+.orb-language {
+  bottom: var(--space-xl);
+  left: calc(var(--space-xl) + 56px);
+}
+
+/* -------------------- Responsive -------------------- */
+@media (max-width: 640px) {
+  .menu-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-sm);
+    padding: var(--space-md);
+  }
+
+  .menu-tile {
+    padding: var(--space-md) var(--space-sm);
+  }
+
+  .menu-tile .tile-icon {
+    font-size: 1.5rem;
+  }
+
+  .menu-tile .tile-label {
+    font-size: 0.6875rem;
+  }
+
+  .section-container {
+    padding: var(--space-md);
+  }
+
+  .login-card {
+    padding: var(--space-md);
+  }
+}
+
+@media (max-width: 380px) {
+  .menu-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* -------------------- Reduced Motion -------------------- */
 @media (prefers-reduced-motion: reduce) {
-  main > section, .app-section, .section-shell { animation: none; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .backdrop-layer img,
+  .backdrop-layer video {
+    transition: none;
+  }
 }
 
-/* Let the liquid rim be the hero — soften the flat base border */
-.login-glass { border-color: rgba(255, 255, 255, 0.14) !important; }
-
-/* ==========================================================================
-   Phase 24 — EM-SCALED LANDING. Everything measured in em/rem against a
-   fluid root size: the page CENTERs and composes itself identically on
-   every viewport — phone, tablet, projector. No fixed-pixel fragility.
-   ========================================================================== */
-html { font-size: clamp(14px, 0.85rem + 0.55vw, 18px); }
-.landing-root { overflow-x: clip; }
-.landing-topbar {
-  min-height: 5rem;
-  padding: 0 0.9rem;                 /* orbs never kiss the screen edge */
-}
-.login-orb {
-  width: 4.1rem;
-  height: 4.1rem;
-}
-.brand-emblem {
-  width: clamp(4rem, 16vw, 6rem);
-  height: clamp(4rem, 16vw, 6rem);
-}
-.login-glass { border-radius: 1.4rem; }
-.lang-bubble { font-size: 0.72rem; }
-.lang-bubble-click { font-size: 0.56rem; }
-.wordmark { font-size: clamp(1.6rem, 7.2vw, 2.6rem); }
-.wordmark-sub { font-size: clamp(0.62rem, 2.6vw, 0.8rem); }
-
-/* ==========================================================================
-   Boss's menu & footer order: orbs WITH the selections, copyright pinned
-   and humble, menu that doesn't let the page bleed through.
-   ========================================================================== */
-/* Orbs sit in the nav row beside MORE */
-.nav-orbs { display: flex; align-items: center; gap: 0.5rem; }
-.nav-orb-btn {
-  display: grid; place-items: center;
-  width: 2.9rem; height: 2.9rem; border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  transition: transform 0.25s ease, border-color 0.25s ease;
-}
-.nav-orb-btn:hover, .nav-orb-btn:focus-visible {
-  transform: translateY(-2px) scale(1.06);
-  border-color: rgba(255, 255, 255, 0.45);
-}
-/* The old floating corner FABs are retired once signed in — the panels they
-   open stay mounted app-wide (login uses its own topbar orbs). */
-body:not([data-screen="login"]) .ua-fab,
-body:not([data-screen="login"]) .lang-fab { display: none !important; }
-
-/* Copyright: always the bottom line of the viewport, one quiet line — and
-   NEVER over the menu selections. */
-.app-copyright {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
-  padding: 0.45rem 1rem calc(0.45rem + env(safe-area-inset-bottom));
-  text-align: center; font-size: 0.66rem; letter-spacing: 0.02em;
-  color: rgba(233, 227, 212, 0.62);
-  background: linear-gradient(to top, rgba(8, 5, 16, 0.92), rgba(8, 5, 16, 0));
-  pointer-events: none;
-}
-.app-copyright.hidden { display: none; }
-
-/* Menu selections read clean: page content stays OUT of the way */
-.menu-overlay { background: rgba(5, 2, 12, 0.88) !important; }
-
-/* ==========================================================================
-   Boss's rule: when a menu or panel is open, the page behind does not exist.
-   Opaque, no frost — just a solid dark room for the selections.
-   ========================================================================== */
-.menu-overlay { background: rgba(5, 2, 12, 0.97) !important; }
-.ua-overlay { background: rgba(5, 2, 12, 0.92) !important; }
-.ua-panel {
-  background: #17122a !important; /* solid — nothing bleeds through */
-  border: 1px solid rgba(255, 255, 255, 0.16) !important;
-}
-
-/* ==========================================================================
-   This Area Of Code Is: The iPhone-14 pass (boss's order, Aug 2026).
-   Explanation: Mobile is THE app. Pills never wrap, the church list is a
-   solid overlay you can actually read, social icons are modern glyphs, the
-   copyright lives at the true bottom, and no page ever scrolls sideways.
-   ========================================================================== */
-
-/* No horizontal bleed anywhere, ever */
-html, body { overflow-x: clip; }
-
-/* The three promises — ALWAYS side by side, one row */
-.pills-row {
-  display: flex; justify-content: center; align-items: center;
-  gap: 0.5rem; margin-top: 1rem; flex-wrap: nowrap;
-}
-.pills-row .pill { white-space: nowrap; flex-shrink: 1; }
-@media (max-width: 400px) {
-  .pills-row { gap: 0.3rem; }
-  .pills-row .pill { font-size: 0.58rem; padding: 0.3rem 0.55rem; letter-spacing: 0.05em; }
-}
-
-/* Social presence — clean modern glyphs in glass circles (no emoji buttons) */
-.social-row { align-items: center; }
-.social-btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 40px; height: 40px; border-radius: 999px;
-  color: var(--gold, #d4af37);
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.30);
-  transition: transform 150ms ease, background 150ms ease, color 150ms ease;
-}
-.social-btn:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.14); color: #fff; }
-.social-btn svg { display: block; }
-
-/* The Church Door list — a REAL overlay: veil + solid panel + top z-index */
-.picker-overlay {
-  position: fixed; inset: 0; z-index: 90;
-  background: rgba(4, 2, 10, 0.92); /* a true veil — no background words */
-  display: flex; align-items: flex-start; justify-content: center;
-  padding: 14vh 1rem 1rem;
-}
-.picker-panel {
-  width: 100%; max-width: 22rem; max-height: 62vh; overflow-y: auto;
-  border-radius: 18px;
-  background: #17122a; /* SOLID — not one background word bleeds through */
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.65), inset 0 1.5px 0 rgba(255, 255, 255, 0.22);
-}
-
-/* Copyright lives at the TRUE bottom of the page — login and everywhere */
-.landing-root { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
-.landing-root .copyright-strip { margin-top: auto; margin-bottom: 0.5rem; }
-
-/* The app footer reads as a footer, not floating text over the cards */
-.app-copyright {
-  background: linear-gradient(to top, rgba(8, 5, 16, 0.97) 55%, rgba(8, 5, 16, 0)) !important;
-}
-
-/* The sticky header never wraps the wordmark into three lines on a phone */
-@media (max-width: 560px) {
-  header .font-display { font-size: 0.98rem !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  header .auth-input { max-width: 118px; }
+/* -------------------- High Contrast -------------------- */
+@media (prefers-contrast: high) {
+  :root {
+    --glass-bg: rgba(0, 0, 0, 0.95);
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --ntcc-text: #ffffff;
+    --ntcc-text-muted: #cccccc;
+  }
 }
