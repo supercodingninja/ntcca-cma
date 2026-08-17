@@ -2,8 +2,8 @@
 // Unauthorized use is strictly prohibited.
 
 import { useState, useEffect, createContext, useContext, type ReactNode } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
-import { AuthProvider, useAuth } from './lib/auth';
+import { Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
+import { useAuth } from './lib/auth';
 import Login from './pages/Login';
 import Home from './pages/Home';
 import './App.css';
@@ -69,9 +69,9 @@ function AppShell({ children }: { children?: ReactNode }) {
 
 // ==========================================================================
 // This Area Of Code Is: Root Application Component
-// Explanation: Boots the router, auth provider, church context, and theme.
-//              All global providers live here. Routes are flat:
-//              /login = public landing, everything else = protected.
+// Explanation: Boots the church context and routes. NO BrowserRouter here —
+//              main.tsx already provides it. NO AuthProvider here — main.tsx
+//              already provides it. Just routes, guards, and layout.
 // In Other Words: This is the ignition switch for the entire NTCC Music App.
 // ==========================================================================
 export default function App() {
@@ -91,23 +91,19 @@ export default function App() {
 
   return (
     <ChurchContext.Provider value={{ selectedChurchId, setSelectedChurchId }}>
-      <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            {/* Public route */}
-            <Route path="/login" element={<Login />} />
+      <Routes>
+        {/* Public route */}
+        <Route path="/login" element={<Login />} />
 
-            {/* Protected routes */}
-            <Route element={<AuthGuard />}>
-              <Route element={<AppShell />}>
-                <Route path="/" element={<Home />} />
-                <Route path="/home" element={<Home />} />
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Route>
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
+        {/* Protected routes */}
+        <Route element={<AuthGuard />}>
+          <Route element={<AppShell />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+        </Route>
+      </Routes>
     </ChurchContext.Provider>
   );
 }
