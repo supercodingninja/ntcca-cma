@@ -1,105 +1,151 @@
+// Copyright © 2026 Reverend Frederick D. Thomas, Jr. — All Rights Reserved.
+// Unauthorized use is strictly prohibited.
+
 // ==========================================================================
-// This Area Of Code Is: The Church Subdomain System (graham.praises.team).
-// Explanation: Every church gets its own front door — graham.praises.team,
-// tacoma.praises.team, and so on. The app reads the subdomain from the
-// browser address and becomes THAT church's app: its name on the login
-// screen, its own accounts, its own stream. No subdomain (demo file,
-// localhost)? The director sets the church code once in Admin, or you can
-// test with ?church=graham in the address. Per-church data is namespaced
-// so 100+ churches never see each other's things.
-// In Other Words: One app, a hundred church doors — the address tells the
-// app whose sanctuary you just walked into.
+// This Area Of Code Is: The NTCCA Church Registry (subdomain universe).
+// Explanation: praises.team is the organization door. Every church gets
+// city.praises.team. Each entry carries the church's real social links.
+// Adding church #101 is one line.
 // ==========================================================================
 
-export interface ChurchProfile {
-  /** subdomain code, e.g. "graham" ("ntcca" = the organization door) */
+export interface ChurchSocial {
+  website?: string;
+  facebook?: string;
+  instagram?: string;
+  twitter?: string;
+  youtube?: string;
+}
+
+export interface ChurchEntry {
   code: string;
-  /** display name, e.g. "NTCC Graham, WA" */
   name: string;
-  /** the church's default live stream link (YouTube Live / MP4) */
-  streamUrl: string;
-  /** where musicians email their Saturday practice reports */
-  reportEmail: string;
+  kind: 'org' | 'church' | 'seminary' | 'office' | 'campground';
+  location: string;
+  social: ChurchSocial;
 }
 
-const PROFILE_KEY = 'ntcc.church.profile';
+export const ORG: ChurchEntry = {
+  code: 'ntcca',
+  name: 'NTCCA — New Testament Christian Churches of America, Inc.',
+  kind: 'org',
+  location: 'United States',
+  social: {
+    website: 'https://myntcc.org',
+    facebook: 'https://www.facebook.com/New-Testament-Christian-Churches-of-America',
+    twitter: 'https://twitter.com/NTCC_of_America',
+    youtube: 'https://www.youtube.com/@NTCCofAmericaLive',
+  },
+};
 
-import { findChurch } from './churches';
+export const CHURCH_REGISTRY: ChurchEntry[] = [
+  ORG,
+  { code: 'seminary-ph', name: 'NTCC Seminary — Philippines', kind: 'seminary', location: 'Angeles City, Philippines', social: { website: 'https://myntcc.org' } },
+  { code: 'seminary-az', name: 'NTCC Seminary — Arizona', kind: 'seminary', location: 'Phoenix, Arizona', social: { website: 'https://myntcc.org' } },
+  { code: 'seminary-graham', name: 'NTCC Seminary — Graham, WA', kind: 'seminary', location: 'Graham, Washington', social: { website: 'https://myntcc.org/grahamwa' } },
+  { code: 'mainoffice', name: 'NTCC Of America, Inc Main Office', kind: 'office', location: 'United States', social: { website: 'https://myntcc.org' } },
+  { code: 'campground', name: 'NTCC Of America, National Campground', kind: 'campground', location: 'United States', social: { website: 'https://myntcc.org' } },
+  { code: '29', name: 'NTCC 29 Palms, CA', kind: 'church', location: 'Twentynine Palms, California', social: { website: 'https://myntcc.org' } },
+  { code: 'albuquerque', name: 'NTCC Albuquerque, NM', kind: 'church', location: 'Albuquerque, New Mexico', social: { website: 'https://myntcc.org' } },
+  { code: 'amarillo', name: 'NTCC Amarillo, TX', kind: 'church', location: 'Amarillo, Texas', social: { website: 'https://myntcc.org' } },
+  { code: 'anchorage', name: 'NTCC Anchorage, AK', kind: 'church', location: 'Anchorage, Alaska', social: { website: 'https://myntcc.org' } },
+  { code: 'angeles', name: 'NTCC Angeles City', kind: 'church', location: 'Angeles City, Philippines', social: { website: 'https://myntcc.org' } },
+  { code: 'augusta', name: 'NTCC Augusta, GA', kind: 'church', location: 'Augusta, Georgia', social: { website: 'https://myntcc.org' } },
+  { code: 'austin', name: 'NTCC Austin, TX', kind: 'church', location: 'Austin, Texas', social: { website: 'https://myntcc.org' } },
+  { code: 'auxvasse', name: 'NTCC Auxvasse, MO', kind: 'church', location: 'Auxvasse, Missouri', social: { website: 'https://myntcc.org' } },
+  { code: 'bakersfield', name: 'NTCC Bakersfield, CA', kind: 'church', location: 'Bakersfield, California', social: { website: 'https://myntcc.org' } },
+  { code: 'baltimore', name: 'NTCC Baltimore, MD', kind: 'church', location: 'Baltimore, Maryland', social: { website: 'https://myntcc.org' } },
+  { code: 'belleville', name: 'NTCC Belleville, IL', kind: 'church', location: 'Belleville, Illinois', social: { website: 'https://myntcc.org' } },
+  { code: 'berkeley', name: 'NTCC Berkeley, MO', kind: 'church', location: 'Berkeley, Missouri', social: { website: 'https://myntcc.org' } },
+  { code: 'bremerton', name: 'NTCC Bremerton, WA', kind: 'church', location: 'Bremerton, Washington', social: { website: 'https://myntcc.org' } },
+  { code: 'brooklyn', name: 'NTCC Brooklyn, NY', kind: 'church', location: 'Brooklyn, New York', social: { website: 'https://myntcc.org' } },
+  { code: 'cagayan', name: 'NTCC Cagayan de Oro', kind: 'church', location: 'Cagayan de Oro, Philippines', social: { website: 'https://myntcc.org' } },
+  { code: 'camphumphreys', name: 'NTCC Camp Humphreys, South Korea', kind: 'church', location: 'Camp Humphreys, South Korea', social: { website: 'https://myntcc.org' } },
+  { code: 'centralflorida', name: 'NTCC Central Florida', kind: 'church', location: 'Central Florida', social: { website: 'https://myntcc.org' } },
+  { code: 'charleston', name: 'NTCC Charleston, WV', kind: 'church', location: 'Charleston, West Virginia', social: { website: 'https://myntcc.org' } },
+  { code: 'charlotte', name: 'NTCC Charlotte, NC', kind: 'church', location: 'Charlotte, North Carolina', social: { website: 'https://myntcc.org' } },
+  { code: 'cheyenne', name: 'NTCC Cheyenne, WY', kind: 'church', location: 'Cheyenne, Wyoming', social: { website: 'https://myntcc.org' } },
+  { code: 'chicagoheights', name: 'NTCC Chicago Heights, IL', kind: 'church', location: 'Chicago Heights, Illinois', social: { website: 'https://myntcc.org' } },
+  { code: 'coloradosprings', name: 'NTCC Colorado Springs, CO', kind: 'church', location: 'Colorado Springs, Colorado', social: { website: 'https://myntcc.org' } },
+  { code: 'columbia', name: 'NTCC Columbia, SC', kind: 'church', location: 'Columbia, South Carolina', social: { website: 'https://myntcc.org' } },
+  { code: 'columbus', name: 'NTCC Columbus, OH', kind: 'church', location: 'Columbus, Ohio', social: { website: 'https://myntcc.org' } },
+  { code: 'corpuschristi', name: 'NTCC Corpus Christi, TX', kind: 'church', location: 'Corpus Christi, Texas', social: { website: 'https://myntcc.org' } },
+  { code: 'dallas', name: 'NTCC Dallas, TX', kind: 'church', location: 'Dallas, Texas', social: { website: 'https://myntcc.org' } },
+  { code: 'dayton', name: 'NTCC Dayton, OH', kind: 'church', location: 'Dayton, Ohio', social: { website: 'https://myntcc.org' } },
+  { code: 'delcity', name: 'NTCC Del City, OK', kind: 'church', location: 'Del City, Oklahoma', social: { website: 'https://myntcc.org' } },
+  { code: 'denver', name: 'NTCC Denver, CO', kind: 'church', location: 'Denver, Colorado', social: { website: 'https://myntcc.org' } },
+  { code: 'detroit', name: 'NTCC Detroit, MI', kind: 'church', location: 'Detroit, Michigan', social: { website: 'https://myntcc.org' } },
+  { code: 'elpaso', name: 'NTCC El Paso, TX', kind: 'church', location: 'El Paso, Texas', social: { website: 'https://myntcc.org' } },
+  { code: 'fairborn', name: 'NTCC Fairborn, OH', kind: 'church', location: 'Fairborn, Ohio', social: { website: 'https://myntcc.org' } },
+  { code: 'fayetteville', name: 'NTCC Fayetteville, NC', kind: 'church', location: 'Fayetteville, North Carolina', social: { website: 'https://myntcc.org' } },
+  { code: 'fresno', name: 'NTCC Fresno, CA', kind: 'church', location: 'Fresno, California', social: { website: 'https://myntcc.org' } },
+  { code: 'ftworth', name: 'NTCC Ft Worth, TX', kind: 'church', location: 'Fort Worth, Texas', social: { website: 'https://myntcc.org' } },
+  { code: 'glendale', name: 'NTCC Glendale, AZ', kind: 'church', location: 'Glendale, Arizona', social: { website: 'https://myntcc.org' } },
+  { code: 'graham', name: 'NTCC Graham, WA', kind: 'church', location: 'Graham, Washington', social: { website: 'https://myntcc.org/grahamwa', facebook: 'https://fb.me/grahamntcc', instagram: 'https://instagram.com/grahamntcc', twitter: 'https://twitter.com/GRAHAMNTCCNTCS', youtube: 'https://www.youtube.com/@ntccgrahamwa5506' } },
+  { code: 'guam', name: 'NTCC Guam', kind: 'church', location: 'Guam', social: { website: 'https://myntcc.org' } },
+  { code: 'hannibal', name: 'NTCC Hannibal, MO', kind: 'church', location: 'Hannibal, Missouri', social: { website: 'https://myntcc.org' } },
+  { code: 'hawaii', name: 'NTCC Hawaii', kind: 'church', location: 'Hawaii', social: { website: 'https://myntcc.org' } },
+  { code: 'hinesville', name: 'NTCC Hinesville, GA', kind: 'church', location: 'Hinesville, Georgia', social: { website: 'https://myntcc.org' } },
+  { code: 'hopkinsville', name: 'NTCC Hopkinsville, KY', kind: 'church', location: 'Hopkinsville, Kentucky', social: { website: 'https://myntcc.org' } },
+  { code: 'indianapolis', name: 'NTCC Indianapolis, IN', kind: 'church', location: 'Indianapolis, Indiana', social: { website: 'https://myntcc.org' } },
+  { code: 'irving', name: 'NTCC Irving, TX', kind: 'church', location: 'Irving, Texas', social: { website: 'https://myntcc.org' } },
+  { code: 'jacksonvillear', name: 'NTCC Jacksonville, AR', kind: 'church', location: 'Jacksonville, Arkansas', social: { website: 'https://myntcc.org' } },
+  { code: 'jacksonvillenc', name: 'NTCC Jacksonville, NC', kind: 'church', location: 'Jacksonville, North Carolina', social: { website: 'https://myntcc.org' } },
+  { code: 'junctioncity', name: 'NTCC Junction City, KS', kind: 'church', location: 'Junction City, Kansas', social: { website: 'https://myntcc.org' } },
+  { code: 'kaneohe', name: 'NTCC Kaneohe, HI', kind: 'church', location: 'Kaneohe, Hawaii', social: { website: 'https://myntcc.org' } },
+  { code: 'killeen', name: 'NTCC Killeen, TX', kind: 'church', location: 'Killeen, Texas', social: { website: 'https://myntcc.org' } },
+  { code: 'lacey', name: 'NTCC Lacey, WA', kind: 'church', location: 'Lacey, Washington', social: { website: 'https://myntcc.org' } },
+  { code: 'lakeland', name: 'NTCC Lakeland, FL', kind: 'church', location: 'Lakeland, Florida', social: { website: 'https://myntcc.org' } },
+  { code: 'lawton', name: 'NTCC Lawton, OK', kind: 'church', location: 'Lawton, Oklahoma', social: { website: 'https://myntcc.org' } },
+  { code: 'leesville', name: 'NTCC Leesville, LA', kind: 'church', location: 'Leesville, Louisiana', social: { website: 'https://myntcc.org' } },
+  { code: 'lexington', name: 'NTCC Lexington, KY', kind: 'church', location: 'Lexington, Kentucky', social: { website: 'https://myntcc.org' } },
+  { code: 'losangeles', name: 'NTCC Los Angeles, CA', kind: 'church', location: 'Los Angeles, California', social: { website: 'https://myntcc.org' } },
+  { code: 'louisville', name: 'NTCC Louisville, KY', kind: 'church', location: 'Louisville, Kentucky', social: { website: 'https://myntcc.org' } },
+  { code: 'macon', name: 'NTCC Macon, GA', kind: 'church', location: 'Macon, Georgia', social: { website: 'https://myntcc.org' } },
+  { code: 'madison', name: 'NTCC Madison, WI', kind: 'church', location: 'Madison, Wisconsin', social: { website: 'https://myntcc.org' } },
+  { code: 'mckeesrocks', name: 'NTCC McKees Rocks, PA', kind: 'church', location: 'McKees Rocks, Pennsylvania', social: { website: 'https://myntcc.org' } },
+  { code: 'memphis', name: 'NTCC Memphis, TN', kind: 'church', location: 'Memphis, Tennessee', social: { website: 'https://myntcc.org' } },
+  { code: 'mesa', name: 'NTCC Mesa, AZ', kind: 'church', location: 'Mesa, Arizona', social: { website: 'https://myntcc.org' } },
+  { code: 'miami', name: 'NTCC Miami, FL', kind: 'church', location: 'Miami, Florida', social: { website: 'https://myntcc.org' } },
+  { code: 'modesto', name: 'NTCC Modesto, CA', kind: 'church', location: 'Modesto, California', social: { website: 'https://myntcc.org' } },
+  { code: 'nashville', name: 'NTCC Nashville, TN', kind: 'church', location: 'Nashville, Tennessee', social: { website: 'https://myntcc.org' } },
+  { code: 'newportnews', name: 'NTCC Newport News, VA', kind: 'church', location: 'Newport News, Virginia', social: { website: 'https://myntcc.org' } },
+  { code: 'oceanside', name: 'NTCC Oceanside, CA', kind: 'church', location: 'Oceanside, California', social: { website: 'https://myntcc.org' } },
+  { code: 'okinawa', name: 'NTCC Okinawa, Japan', kind: 'church', location: 'Okinawa, Japan', social: { website: 'https://myntcc.org' } },
+  { code: 'orangepark', name: 'NTCC Orange Park, FL', kind: 'church', location: 'Orange Park, Florida', social: { website: 'https://myntcc.org' } },
+  { code: 'orlando', name: 'NTCC Orlando, FL', kind: 'church', location: 'Orlando, Florida', social: { website: 'https://myntcc.org' } },
+  { code: 'panama', name: 'NTCC Panama', kind: 'church', location: 'Panama', social: { website: 'https://myntcc.org' } },
+  { code: 'pasadena', name: 'NTCC Pasadena, TX', kind: 'church', location: 'Pasadena, Texas', social: { website: 'https://myntcc.org' } },
+  { code: 'phenixcity', name: 'NTCC Phenix City, AL', kind: 'church', location: 'Phenix City, Alabama', social: { website: 'https://myntcc.org' } },
+  { code: 'portland', name: 'NTCC Portland, OR', kind: 'church', location: 'Portland, Oregon', social: { website: 'https://myntcc.org' } },
+  { code: 'puertorico', name: 'NTCC Puerto Rico', kind: 'church', location: 'Puerto Rico', social: { website: 'https://myntcc.org' } },
+  { code: 'redding', name: 'NTCC Redding, CA', kind: 'church', location: 'Redding, California', social: { website: 'https://myntcc.org' } },
+  { code: 'renton', name: 'NTCC Renton, WA', kind: 'church', location: 'Renton, Washington', social: { website: 'https://myntcc.org' } },
+  { code: 'richmond', name: 'NTCC Richmond, VA', kind: 'church', location: 'Richmond, Virginia', social: { website: 'https://myntcc.org' } },
+  { code: 'riverdale', name: 'NTCC Riverdale, GA', kind: 'church', location: 'Riverdale, Georgia', social: { website: 'https://myntcc.org' } },
+  { code: 'sanantonio', name: 'NTCC San Antonio, TX', kind: 'church', location: 'San Antonio, Texas', social: { website: 'https://myntcc.org' } },
+  { code: 'secaucus', name: 'NTCC Secaucus, NJ', kind: 'church', location: 'Secaucus, New Jersey', social: { website: 'https://myntcc.org' } },
+  { code: 'shreveport', name: 'NTCC Shreveport, LA & Barksdale AFB', kind: 'church', location: 'Shreveport, Louisiana', social: { website: 'https://myntcc.org' } },
+  { code: 'sierravista', name: 'NTCC Sierra Vista, AZ', kind: 'church', location: 'Sierra Vista, Arizona', social: { website: 'https://myntcc.org' } },
+  { code: 'siouxfalls', name: 'NTCC Sioux Falls, SD', kind: 'church', location: 'Sioux Falls, South Dakota', social: { website: 'https://myntcc.org' } },
+  { code: 'marietta', name: 'NTCC Marietta, GA', kind: 'church', location: 'Marietta, Georgia', social: { website: 'https://myntcc.org' } },
+  { code: 'spokane', name: 'NTCC Spokane, WA', kind: 'church', location: 'Spokane, Washington', social: { website: 'https://myntcc.org' } },
+  { code: 'spokiette', name: 'NTCC Spokiette, WA', kind: 'church', location: 'Spokiette, Washington', social: { website: 'https://myntcc.org' } },
+  { code: 'springfield', name: 'NTCC Springfield, MO', kind: 'church', location: 'Springfield, Missouri', social: { website: 'https://myntcc.org' } },
+  { code: 'stlouis', name: 'NTCC St Louis, MO', kind: 'church', location: 'St. Louis, Missouri', social: { website: 'https://myntcc.org' } },
+  { code: 'tampa', name: 'NTCC Tampa, FL', kind: 'church', location: 'Tampa, Florida', social: { website: 'https://myntcc.org' } },
+  { code: 'tillicum', name: 'NTCC Tillicum, WA', kind: 'church', location: 'Tillicum, Washington', social: { website: 'https://myntcc.org' } },
+  { code: 'tucson', name: 'NTCC Tucson, AZ', kind: 'church', location: 'Tucson, Arizona', social: { website: 'https://myntcc.org' } },
+  { code: 'vilseck', name: 'NTCC Vilseck, Germany', kind: 'church', location: 'Vilseck, Germany', social: { website: 'https://myntcc.org' } },
+  { code: 'washingtondc', name: 'NTCC Washington D.C.', kind: 'church', location: 'Washington, D.C.', social: { website: 'https://myntcc.org' } },
+  { code: 'watertown', name: 'NTCC Watertown, NY', kind: 'church', location: 'Watertown, New York', social: { website: 'https://myntcc.org' } },
+  { code: 'wichita', name: 'NTCC Wichita, KS', kind: 'church', location: 'Wichita, Kansas', social: { website: 'https://myntcc.org' } },
+  { code: 'woodbrook', name: 'NTCC Woodbrook, WA', kind: 'church', location: 'Woodbrook, Washington', social: { website: 'https://myntcc.org' } },
+];
 
-/** Read the church code from the browser address.
- *  graham.praises.team → "graham" · praises.team → "ntcca" (the org door)
- *  · ?church=graham → "graham" · else '' (demo file / localhost). */
-export function subdomainChurchCode(): string {
-  try {
-    const q = new URLSearchParams(window.location.search).get('church');
-    if (q) {
-      const clean = q.toLowerCase().replace(/[^a-z0-9-]/g, '');
-      // Real church codes are short city names ("graham", "tacoma"). A long
-      // gibberish string is a corrupted value — ignore it, don't display it.
-      if (clean && clean.length <= 24) return clean;
-    }
-    const host = window.location.hostname; // '' for file://
-    if (!host || host === 'localhost' || /^\d+\.\d+\.\d+\.\d+$/.test(host)) return '';
-    // Church doors exist ONLY under praises.team — never trust any other
-    // host (preview URLs carry random labels that are NOT churches).
-    if (host === 'praises.team' || host === 'www.praises.team') return 'ntcca';
-    if (host.endsWith('.praises.team')) return host.split('.')[0].toLowerCase();
-  } catch { /* fall through */ }
-  return '';
+export function findChurch(code: string): ChurchEntry | undefined {
+  return CHURCH_REGISTRY.find((c) => c.code === code);
 }
 
-export function loadChurchProfile(): ChurchProfile {
-  try {
-    // A viewer invite link can carry the church's stream once (?stream=...):
-    // the device keeps it, so from then on the viewer just opens the app.
-    const incoming = new URLSearchParams(window.location.search).get('stream');
-    const raw = localStorage.getItem(PROFILE_KEY);
-    if (raw) {
-      const p = JSON.parse(raw) as ChurchProfile;
-      const sub = subdomainChurchCode();
-      let changed = false;
-      // Older profiles may predate reportEmail — heal it without a duplicate key.
-      let next: ChurchProfile = { ...p, reportEmail: p.reportEmail ?? '' };
-      // Heal a corrupted code saved by an older build (random preview hosts
-      // leaked in as 30+ character gibberish). Unknown long codes can never
-      // be real church doors — reset to the default Graham door.
-      if (!findChurch(next.code) && next.code.length > 24) {
-        const door = sub || 'graham';
-        next = { ...next, code: door, name: findChurch(door)?.name ?? `NTCC ${cap(door)}` };
-        changed = true;
-      }
-      // Heal any corrupted name: the registry name ALWAYS wins.
-      const known = findChurch(next.code);
-      if (known && next.name !== known.name) { next = { ...next, name: known.name }; changed = true; }
-      // The subdomain ALWAYS wins — the address is the church.
-      if (sub && sub !== next.code) {
-        next = { ...next, code: sub, name: findChurch(sub)?.name ?? next.name ?? `NTCC ${cap(sub)}` };
-        changed = true;
-      }
-      if (incoming && incoming !== next.streamUrl) { next = { ...next, streamUrl: incoming }; changed = true; }
-      if (changed) { saveChurchProfile(next); return next; }
-      return next;
-    }
-  } catch { /* fall through */ }
-  const sub = subdomainChurchCode() || 'graham';
-  const entry = findChurch(sub);
-  // A previously-corrupted name (random preview hosts) heals here: the
-  // registry name ALWAYS wins when we know the church.
-  const incoming = new URLSearchParams(window.location.search).get('stream') ?? '';
-  return {
-    code: sub,
-    name: entry?.name ?? `NTCC ${cap(sub)}`,
-    streamUrl: incoming,
-    reportEmail: '',
-  };
+export function churchUrl(code: string): string {
+  return code === 'ntcca' ? 'https://praises.team/' : `https://${code}.praises.team/`;
 }
-
-export function saveChurchProfile(p: ChurchProfile): void {
-  localStorage.setItem(PROFILE_KEY, JSON.stringify(p));
-}
-
-function cap(s: string): string {
-  return s.charAt(0).toUpperCase() + s.slice(1);
-}
-
-/** Namespaced storage key so each church's data stays its own. */
