@@ -1,93 +1,197 @@
+// Copyright © 2026 Reverend Frederick D. Thomas, Jr. — All Rights Reserved.
+// Unauthorized use is strictly prohibited.
+
 // ==========================================================================
-// This Area Of Code Is: The cinematic photo backdrop (Adoración DNA).
-// Explanation: Full-bleed church photography behind everything, slow
-// Ken-Burns drift, crossfading to the next random non-repeating photo every
-// 14 seconds, dark-vignetted so text stays readable. Each role sees its own
-// slice of the photo pool.
-// In Other Words: The church's memories play softly behind the app.
+// This Area Of Code Is: The cinematic background — church photos and videos
+// playing behind the app like a slow movie, with Ken Burns drift and fade
+// transitions. Every role sees a different starting point in the reel, and
+// no photo repeats until all have shown.
+// Explanation: The backdrop pulls from two sources: (1) the shared photo
+// pool in `src/lib/photos.ts` — 43 church memories that shuffle without
+// repetition, and (2) per-church uploads from `src/lib/churchbg.ts` — each
+// church hangs its own family photos on its own walls. The John Orkin Smith
+// memorial photo (58F53E82...) is NEVER shown on the landing page — text
+// would confuse the login words. Videos auto-play muted and loop.
+// In Other Words: The stained glass and sanctuary photos behind the app —
+// slowly changing, never repeating, always appropriate to whose church
+// you're visiting.
 // ==========================================================================
 
-import { useEffect, useRef, useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { nextPhoto, currentPhoto } from '../lib/photos';
 import { resolveChurchBg, type ResolvedBg } from '../lib/churchbg';
-import { loadChurchProfile } from '../lib/church';
-import type { Role } from '../lib/auth';
+import { type Role } from '../lib/auth';
 
+// --------------------------------------------------------------------------
+// Props
+// --------------------------------------------------------------------------
+interface BackdropProps {
+  role: Role;
+  landing?: boolean;
+  churchCode?: string;
+}
+
+// Fade duration in ms — must match CSS transition
 const FADE_MS = 1600;
-const TICK_MS = 14000;
-// John Orkin Smith's In Memoriam photo plays everywhere in the app EXCEPT
-// the landing — its text confuses the login words there. Honor, placed right.
+// Time between photo changes
+const INTERVAL_MS = 8000;
+// The memorial photo that never appears on the landing page
 const MEMORIAL = '58F53E82-7541-4A48-90EE-6FB05E20B4A7';
 
-export default function Backdrop({ role, dim = 0.72, landing = false }: { role: Role; dim?: number; landing?: boolean }) {
-  // Per-church media (pictures AND videos the church uploaded) — every third
-  // backdrop turn comes from the church's own walls when it has them.
+// --------------------------------------------------------------------------
+// Backdrop component
+// --------------------------------------------------------------------------
+export default function Backdrop({ role, landing = false, churchCode }: BackdropProps) {
+  const [photo, setPhoto] = useState('');
+  const [nextPhotoUrl, setNextPhotoUrl] = useState('');
   const [churchMedia, setChurchMedia] = useState<ResolvedBg[]>([]);
+  const [mediaIndex, setMediaIndex] = useState(0);
+  const [fading, setFading] = useState(false);
+
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const churchTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // ------------------------------------------------------------------------
+  // Load per-church background media
+  // ------------------------------------------------------------------------
   useEffect(() => {
-    void resolveChurchBg(loadChurchProfile().code).then(setChurchMedia);
-  }, []);
-  const bgTurn = useRef(0);
+    if (!churchCode || churchCode === 'ntcca') return;
+    let mounted = true;
+    resolveChurchBg(churchCode).then((items) => {
+      if (mounted) setChurchMedia(items);
+    });
+    return () => { mounted = false; };
+  }, [churchCode]);
 
-  const pick = (peek = false) => {
-    if (!peek && churchMedia.length && ++bgTurn.current % 3 === 0) {
-      return churchMedia[Math.floor(Math.random() * churchMedia.length)];
-    }
-    let p = peek ? currentPhoto(role) : nextPhoto(role);
-    while (landing && p.includes(MEMORIAL)) p = nextPhoto(role);
-    return { url: p, kind: 'image' as const };
-  };
-  const [photo, setPhoto] = useState<ResolvedBg>(() => pick(true));
-  const [next, setNext] = useState<ResolvedBg | null>(null);
+  // ------------------------------------------------------------------------
+  // Photo reel — shared pool, one photo at a time with crossfade
+  // ------------------------------------------------------------------------
+  const advancePhoto = useCallback(() => {
+    setFading(true);
+    // Preload the next photo
+    const upcoming = nextPhoto(role);
+    setNextPhotoUrl(upcoming);
 
+    // After fade completes, swap and clear the "next" buffer
+    setTimeout(() => {
+      setPhoto(upcoming);
+      setNextPhotoUrl('');
+      setFading(false);
+    }, FADE_MS);
+  }, [role]);
+
+  // Initialize the first photo
   useEffect(() => {
-    // The sign-out race: if the app was showing the memorial INSIDE (allowed),
-    // the moment we land on the login it must leave NOW — not in 14 seconds.
-    if (landing && photo.url.includes(MEMORIAL)) {
-      const p = pick();
-      setPhoto(p);
-      setNext(null);
+    const initial = currentPhoto(role);
+    setPhoto(initial);
+  }, [role]);
+
+  // Auto-advance the photo reel
+  useEffect(() => {
+    timerRef.current = setInterval(advancePhoto, INTERVAL_MS);
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [advancePhoto]);
+
+  // ------------------------------------------------------------------------
+  // Church media rotation — interleave with shared reel (every 3rd photo)
+  // ------------------------------------------------------------------------
+  useEffect(() => {
+    if (churchMedia.length === 0) return;
+    churchTimerRef.current = setInterval(() => {
+      setMediaIndex((i) => (i + 1) % churchMedia.length);
+    }, INTERVAL_MS * 3);
+    return () => {
+      if (churchTimerRef.current) clearInterval(churchTimerRef.current);
+    };
+  }, [churchMedia.length]);
+
+  // ------------------------------------------------------------------------
+  // Determine what to show: shared photo or church media
+  // ------------------------------------------------------------------------
+  const showChurchMedia = churchMedia.length > 0 && mediaIndex < churchMedia.length;
+  const currentMedia = showChurchMedia ? churchMedia[mediaIndex] : null;
+
+  // On landing, NEVER show the memorial photo (text confuses login)
+  const isMemorial = photo.includes(MEMORIAL);
+  const displayPhoto = landing && isMemorial ? '' : photo;
+
+  // ------------------------------------------------------------------------
+  // Preload the upcoming image for smooth crossfade
+  // ------------------------------------------------------------------------
+  useEffect(() => {
+    if (nextPhotoUrl) {
+      const img = new Image();
+      img.src = nextPhotoUrl;
     }
-    const id = window.setInterval(() => {
-      const p = pick();
-      setNext(p);
-      // After the crossfade completes, promote the next photo to current.
-      window.setTimeout(() => { setPhoto(p); setNext(null); }, FADE_MS);
-    }, TICK_MS);
-    return () => window.clearInterval(id);
-  }, [role, landing]);
+  }, [nextPhotoUrl]);
 
-  const img = (item: ResolvedBg, opacity: number, key: string) => (
-    item.kind === 'video' ? (
-      <video
-        key={key}
-        aria-hidden
-        className="kenburns absolute inset-0 w-full h-full object-cover"
-        src={item.url}
-        autoPlay muted loop playsInline
-        style={{ opacity, transition: `opacity ${FADE_MS}ms ease` }}
-      />
-    ) : (
-      <div
-        key={key}
-        aria-hidden
-        className="kenburns absolute inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage: `url(${item.url})`,
-          opacity,
-          transition: `opacity ${FADE_MS}ms ease`,
-        }}
-      />
-    )
-  );
-
+  // ------------------------------------------------------------------------
+  // Render
+  // ------------------------------------------------------------------------
   return (
-    <div className="fixed inset-0 -z-10 overflow-hidden bg-[var(--space)]">
-      {img(photo, 1, photo.url)}
-      {next && img(next, 1, next.url)}
-      {/* Cinematic vignette — the Adoración dark-photo look */}
-      <div className="absolute inset-0" style={{
-        background: `radial-gradient(120% 90% at 50% 20%, transparent 20%, rgba(6,6,10,${dim}) 75%), linear-gradient(rgba(6,6,10,${dim * 0.55}), rgba(6,6,10,${dim}))`,
-      }} />
+    <div className="backdrop-layer" aria-hidden="true">
+      {/* Current photo — Ken Burns subtle zoom */}
+      {displayPhoto && !currentMedia && (
+        <img
+          src={displayPhoto}
+          alt=""
+          style={{
+            opacity: fading ? 0 : 1,
+            transform: 'scale(1.05)',
+            animation: 'kenBurns 20s ease-in-out infinite alternate',
+          }}
+        />
+      )}
+
+      {/* Next photo (preloaded, fading in) */}
+      {nextPhotoUrl && !currentMedia && (
+        <img
+          src={nextPhotoUrl}
+          alt=""
+          style={{
+            opacity: fading ? 1 : 0,
+            transform: 'scale(1.05)',
+          }}
+        />
+      )}
+
+      {/* Church media — image */}
+      {currentMedia?.kind === 'image' && (
+        <img
+          src={currentMedia.url}
+          alt=""
+          style={{
+            opacity: 1,
+            transform: 'scale(1.05)',
+            animation: 'kenBurns 20s ease-in-out infinite alternate',
+          }}
+        />
+      )}
+
+      {/* Church media — video */}
+      {currentMedia?.kind === 'video' && (
+        <video
+          src={currentMedia.url}
+          autoPlay
+          muted
+          loop
+          playsInline
+          style={{ opacity: 1 }}
+        />
+      )}
+
+      {/* Dark vignette — keeps text readable over any background */}
+      <div className="backdrop-vignette" />
+
+      {/* Ken Burns animation keyframes (injected inline for portability) */}
+      <style>{`
+        @keyframes kenBurns {
+          0% { transform: scale(1.05) translate(0, 0); }
+          100% { transform: scale(1.15) translate(-1%, -1%); }
+        }
+      `}</style>
     </div>
   );
 }
