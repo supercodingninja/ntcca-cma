@@ -1,42 +1,112 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+/* Copyright © 2026 Reverend Frederick D. Thomas, Jr. — All Rights Reserved. */
+/* Unauthorized use is strictly prohibited. */
+
+/* === FEATURE: Glass Cards === */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+/* === FEATURE: Menu System === */
+.menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-menu-overlay);
+  background: rgba(10, 10, 15, 0.85);
+  backdrop-filter: blur(8px);
+}
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+}
+.menu-tile {
+  background: rgba(34, 34, 46, 0.95);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.menu-tile:hover {
+  transform: translateY(-2px);
+  border-color: var(--ntcc-gold);
+}
+
+/* === FEATURE: Buttons === */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+.btn-primary {
+  background: var(--ntcc-gold);
+  color: var(--ntcc-dark);
+}
+.btn-primary:hover {
+  background: var(--ntcc-gold-light);
+  transform: translateY(-1px);
+}
+
+/* === FEATURE: Login Screen === */
+.login-card {
+  position: relative;
+  z-index: var(--z-content);
+  width: 100%;
+  max-width: 420px;
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+/* === FEATURE: Song Cards === */
+.song-card {
+  background: rgba(26, 26, 36, 0.9);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 1rem;
+  transition: all 0.2s ease;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.song-card:hover {
+  border-color: rgba(212, 168, 67, 0.35);
+  transform: translateY(-2px);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+/* === FEATURE: Orbs === */
+.orb {
+  position: fixed;
+  z-index: 500;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(18, 18, 26, 0.98);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(212, 168, 67, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.orb:hover {
+  transform: scale(1.1);
+  border-color: var(--ntcc-gold);
 }
 
-.card {
-  padding: 2em;
+/* === FEATURE: Responsive (feature-specific only) === */
+@media (max-width: 640px) {
+  .menu-grid { grid-template-columns: repeat(3, 1fr); }
+  .menu-tile { padding: 1rem 0.5rem; }
 }
-
-.read-the-docs {
-  color: #888;
+@media (max-width: 380px) {
+  .menu-grid { grid-template-columns: repeat(2, 1fr); }
 }
