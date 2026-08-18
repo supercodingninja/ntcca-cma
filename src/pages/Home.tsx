@@ -1,3 +1,6 @@
+// Copyright © 2026 Reverend Frederick D. Thomas, Jr. — All Rights Reserved.
+// Unauthorized use is strictly prohibited.
+
 // ==========================================================================
 // This Area Of Code Is: The App Shell — auth gate, role universe, photo
 // backdrop, tab navigation, and engine wiring.
@@ -78,6 +81,24 @@ export default function Home() {
   const [online, setOnline] = useState(navigator.onLine);
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // ==========================================================================
+  // This Area Of Code Is: Body scroll lock when menu opens.
+  // Explanation: When the MORE menu is open, the page behind must freeze so
+  // the user can't scroll the background. Adds/removes the 'menu-locked'
+  // class on document.body, which sets overflow: hidden.
+  // In Other Words: The background sits still while the menu is up.
+  // ==========================================================================
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.classList.add('menu-locked');
+    } else {
+      document.body.classList.remove('menu-locked');
+    }
+    return () => {
+      document.body.classList.remove('menu-locked');
+    };
+  }, [menuOpen]);
+
   // Escape closes the overlay menu — the "always a way back" rule.
   useEffect(() => {
     const esc = () => setMenuOpen(false);
@@ -124,7 +145,7 @@ export default function Home() {
     const descriptions: Record<Tab, string> = {
       inicio: 'Home dashboard. Your ministry at a glance.',
       ensayo: 'Practice room. Video tiles, practice queue, synchronized playback, team chat.',
-      library: `${t('library')}. 3 ${t('songsInLibrary')}.`,
+      library: `${t('library')}. ${songs.length} ${t('songsInLibrary')}.`,
       song: song ? `${song.title}.` : t('library'),
       setlist: `${t('setlist')}. ${setlist.length} songs.`,
       history: 'Tracking. Practice and performance history.',
@@ -143,6 +164,7 @@ export default function Home() {
       engineer: 'Engineer bench. Sound meter, run of show, and tempo tools.',
     };
     narrate(descriptions[tab]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab]);
 
   const addToSetlist = (s: Song) => {
