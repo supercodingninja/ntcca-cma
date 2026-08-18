@@ -1,381 +1,65 @@
-// Copyright © 2026 Reverend Frederick D. Thomas, Jr. — All Rights Reserved.
-// Unauthorized use is strictly prohibited.
+/* Copyright © 2026 Reverend Frederick D. Thomas, Jr. — All Rights Reserved. */
+/* Unauthorized use is strictly prohibited. */
 
-// ==========================================================================
-// This Area Of Code Is: The global stylesheet — glass morphism, menu system,
-// backdrop layers, scroll behavior, and responsive layout.
-// Explanation: This is the ONE CSS file that controls every visual layer of
-// the app. The previous version had conflicting overrides (Phase 16, 16b,
-// 16c, 17, and "Boss's rule" all fighting each other) which made the menu
-// transparent and broke scroll behavior. This version consolidates everything
-// into a single clean hierarchy with explicit z-index stacking.
-// In Other Words: The paint job, the wallpaper, and the furniture placement
-// for the entire sanctuary app — one file, no fights, everything visible.
-// ==========================================================================
-
-/* -------------------- CSS Custom Properties -------------------- */
-:root {
-  /* The NTCC palette — gold on dark, like the sanctuary */
-  --ntcc-gold: #d4a843;
-  --ntcc-gold-light: #f0d78c;
-  --ntcc-gold-dark: #a67c2e;
-  --ntcc-dark: #0a0a0f;
-  --ntcc-dark-elevated: #12121a;
-  --ntcc-dark-surface: #1a1a24;
-  --ntcc-dark-panel: #22222e;
-  --ntcc-text: #e8e6e1;
-  --ntcc-text-muted: #9a9894;
-  --ntcc-text-dim: #6a6864;
-  --ntcc-danger: #c44;
-  --ntcc-success: #4a4;
-
-  /* Glass morphism tokens — controlled opacity, never see-through */
-  --glass-bg: rgba(18, 18, 26, 0.92);
-  --glass-bg-solid: rgba(18, 18, 26, 0.98);
-  --glass-border: rgba(212, 168, 67, 0.15);
-  --glass-border-strong: rgba(212, 168, 67, 0.35);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
-
-  /* Spacing scale */
-  --space-xs: 0.25rem;
-  --space-sm: 0.5rem;
-  --space-md: 1rem;
-  --space-lg: 1.5rem;
-  --space-xl: 2rem;
-  --space-2xl: 3rem;
-
-  /* Typography */
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: "SF Mono", Monaco, "Cascadia Code", monospace;
-
-  /* Z-index stack — explicit layers, no guessing */
-  --z-backdrop: -10;
-  --z-content: 10;
-  --z-header: 100;
-  --z-menu: 200;
-  --z-menu-overlay: 250;
-  --z-modal: 300;
-  --z-toast: 400;
-  --z-orb: 500;
+/* === FEATURE: Glass Cards === */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 1.5rem;
 }
 
-/* -------------------- Reset & Base -------------------- */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html {
-  font-size: 16px;
-  -webkit-text-size-adjust: 100%;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-body {
-  font-family: var(--font-sans);
-  background: var(--ntcc-dark);
-  color: var(--ntcc-text);
-  min-height: 100vh;
-  overflow-x: hidden;
-  line-height: 1.5;
-}
-
-/* Body scroll lock — when menu opens, the page behind freezes */
-body.menu-locked {
-  overflow: hidden;
-  touch-action: none;
-}
-
-/* -------------------- Backdrop Layer -------------------- */
-/* The cinematic photo/video reel lives here — always behind everything */
-.backdrop-layer {
-  position: fixed;
-  inset: 0;
-  z-index: var(--z-backdrop);
-  overflow: hidden;
-}
-
-.backdrop-layer img,
-.backdrop-layer video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: opacity 1.6s ease-in-out;
-}
-
-/* The dark vignette that keeps text readable over photos */
-.backdrop-vignette {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse at 50% 20%, transparent 0%, rgba(10,10,15,0.4) 60%, rgba(10,10,15,0.85) 100%),
-    linear-gradient(to bottom, rgba(10,10,15,0.3) 0%, transparent 30%, transparent 70%, rgba(10,10,15,0.6) 100%);
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* -------------------- App Shell -------------------- */
-#root {
-  position: relative;
-  z-index: var(--z-content);
-  min-height: 100vh;
-}
-
-.app-shell {
-  position: relative;
-  z-index: var(--z-content);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-/* -------------------- Header / Top Bar -------------------- */
-.app-header {
-  position: sticky;
-  top: 0;
-  z-index: var(--z-header);
-  background: var(--glass-bg-solid);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--glass-border);
-  padding: var(--space-sm) var(--space-md);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-md);
-}
-
-.app-header h1 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--ntcc-gold);
-  letter-spacing: 0.02em;
-}
-
-/* -------------------- Menu System (The Fix) -------------------- */
-/* The menu overlay — opaque, never see-through, always on top */
+/* === FEATURE: Menu System === */
 .menu-overlay {
   position: fixed;
   inset: 0;
   z-index: var(--z-menu-overlay);
   background: rgba(10, 10, 15, 0.85);
   backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding-top: 4rem;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
 }
-
-.menu-overlay.open {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* The menu grid — scrollable, but NEVER bleeds to body */
 .menu-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: var(--space-md);
-  padding: var(--space-lg);
-  max-width: 640px;
-  width: 100%;
-  max-height: calc(100vh - 6rem);
-  overflow-y: auto;
-  overflow-x: hidden;
-  overscroll-behavior: contain;           /* ← FIX: scroll hijacking stopped */
-  touch-action: pan-y;                    /* ← FIX: mobile scroll contained */
-  -webkit-overflow-scrolling: touch;
+  gap: 1rem;
 }
-
-/* Each menu tile — SOLID background, not transparent glass */
 .menu-tile {
-  background: var(--ntcc-dark-panel);     /* ← FIX: was rgba(255,255,255,0.08) */
+  background: rgba(34, 34, 46, 0.95);
   border: 1px solid var(--glass-border);
   border-radius: 12px;
-  padding: var(--space-lg) var(--space-md);
+  padding: 1.5rem 1rem;
   text-align: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-sm);
 }
-
-.menu-tile:hover,
-.menu-tile:focus {
-  background: var(--ntcc-dark-surface);
-  border-color: var(--glass-border-strong);
+.menu-tile:hover {
   transform: translateY(-2px);
-  box-shadow: var(--glass-shadow);
-}
-
-.menu-tile:active {
-  transform: translateY(0);
-}
-
-.menu-tile .tile-icon {
-  font-size: 1.75rem;
-  line-height: 1;
-}
-
-.menu-tile .tile-label {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--ntcc-text);
-}
-
-/* Active ring — gold halo on the current section */
-.menu-tile.active {
   border-color: var(--ntcc-gold);
-  box-shadow: 0 0 0 2px rgba(212, 168, 67, 0.25), var(--glass-shadow);
 }
 
-/* -------------------- Menu Trigger Button -------------------- */
-.menu-trigger {
-  position: fixed;
-  bottom: var(--space-xl);
-  right: var(--space-xl);
-  z-index: var(--z-menu);
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--ntcc-gold);
-  color: var(--ntcc-dark);
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 16px rgba(212, 168, 67, 0.4);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.menu-trigger:hover {
-  transform: scale(1.08);
-  box-shadow: 0 6px 24px rgba(212, 168, 67, 0.5);
-}
-
-.menu-trigger:active {
-  transform: scale(0.95);
-}
-
-/* -------------------- Glass Cards -------------------- */
-.glass-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--glass-border);
-  border-radius: 16px;
-  padding: var(--space-lg);
-  box-shadow: var(--glass-shadow);
-}
-
-.glass-card-solid {
-  background: var(--glass-bg-solid);
-  border: 1px solid var(--glass-border);
-  border-radius: 16px;
-  padding: var(--space-lg);
-  box-shadow: var(--glass-shadow);
-}
-
-/* -------------------- Forms & Inputs -------------------- */
-input, textarea, select {
-  font-family: inherit;
-  font-size: 1rem;
-  background: var(--ntcc-dark-elevated);
-  color: var(--ntcc-text);
-  border: 1px solid var(--glass-border);
-  border-radius: 8px;
-  padding: var(--space-sm) var(--space-md);
-  width: 100%;
-  outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-input:focus, textarea:focus, select:focus {
-  border-color: var(--ntcc-gold);
-  box-shadow: 0 0 0 3px rgba(212, 168, 67, 0.15);
-}
-
-input::placeholder, textarea::placeholder {
-  color: var(--ntcc-text-dim);
-}
-
-label {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--ntcc-text-muted);
-  margin-bottom: var(--space-xs);
-}
-
-/* -------------------- Buttons -------------------- */
+/* === FEATURE: Buttons === */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-sm);
-  padding: var(--space-sm) var(--space-lg);
+  gap: 0.5rem;
+  padding: 0.5rem 1.5rem;
   border-radius: 10px;
-  font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
   border: none;
   transition: all 0.2s ease;
-  white-space: nowrap;
 }
-
 .btn-primary {
   background: var(--ntcc-gold);
   color: var(--ntcc-dark);
 }
-
 .btn-primary:hover {
   background: var(--ntcc-gold-light);
   transform: translateY(-1px);
 }
 
-.btn-secondary {
-  background: transparent;
-  color: var(--ntcc-gold);
-  border: 1px solid var(--ntcc-gold);
-}
-
-.btn-secondary:hover {
-  background: rgba(212, 168, 67, 0.1);
-}
-
-.btn-danger {
-  background: var(--ntcc-danger);
-  color: white;
-}
-
-.btn-sm {
-  padding: var(--space-xs) var(--space-sm);
-  font-size: 0.8125rem;
-  border-radius: 6px;
-}
-
-/* -------------------- Login Screen -------------------- */
-.login-screen {
-  position: relative;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-xl);
-}
-
+/* === FEATURE: Login Screen === */
 .login-card {
   position: relative;
   z-index: var(--z-content);
@@ -384,208 +68,45 @@ label {
   text-align: center;
 }
 
-.login-card .brand {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--ntcc-gold);
-  margin-bottom: var(--space-xs);
-}
-
-.login-card .subtitle {
-  font-size: 0.9375rem;
-  color: var(--ntcc-text-muted);
-  margin-bottom: var(--space-xl);
-}
-
-.church-select {
-  width: 100%;
-  margin-bottom: var(--space-lg);
-}
-
-/* -------------------- Section Containers -------------------- */
-.section-container {
-  padding: var(--space-lg);
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--space-lg);
-  padding-bottom: var(--space-sm);
-  border-bottom: 1px solid var(--glass-border);
-}
-
-.section-header h2 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--ntcc-gold);
-}
-
-/* -------------------- Song Cards -------------------- */
+/* === FEATURE: Song Cards === */
 .song-card {
-  background: var(--ntcc-dark-surface);
+  background: rgba(26, 26, 36, 0.9);
   border: 1px solid var(--glass-border);
   border-radius: 12px;
-  padding: var(--space-md);
+  padding: 1rem;
   transition: all 0.2s ease;
-  cursor: pointer;
 }
-
 .song-card:hover {
-  border-color: var(--glass-border-strong);
+  border-color: rgba(212, 168, 67, 0.35);
   transform: translateY(-2px);
-  box-shadow: var(--glass-shadow);
 }
 
-.song-card .song-title {
-  font-weight: 600;
-  color: var(--ntcc-text);
-  margin-bottom: var(--space-xs);
-}
-
-.song-card .song-meta {
-  font-size: 0.8125rem;
-  color: var(--ntcc-text-muted);
-  display: flex;
-  gap: var(--space-sm);
-  flex-wrap: wrap;
-}
-
-.song-card .song-tags {
-  display: flex;
-  gap: var(--space-xs);
-  margin-top: var(--space-sm);
-  flex-wrap: wrap;
-}
-
-.tag {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: rgba(212, 168, 67, 0.12);
-  color: var(--ntcc-gold);
-}
-
-.tag-choir {
-  background: rgba(68, 170, 68, 0.15);
-  color: var(--ntcc-success);
-}
-
-/* -------------------- Scrollbars -------------------- */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(212, 168, 67, 0.25);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(212, 168, 67, 0.4);
-}
-
-/* -------------------- Accessibility Orbs -------------------- */
+/* === FEATURE: Orbs === */
 .orb {
   position: fixed;
-  z-index: var(--z-orb);
+  z-index: 500;
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: var(--glass-bg-solid);
+  background: rgba(18, 18, 26, 0.98);
   backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border-strong);
+  border: 1px solid rgba(212, 168, 67, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
   cursor: pointer;
-  box-shadow: var(--glass-shadow);
   transition: all 0.3s ease;
 }
-
 .orb:hover {
   transform: scale(1.1);
   border-color: var(--ntcc-gold);
-  box-shadow: 0 0 16px rgba(212, 168, 67, 0.3);
 }
 
-.orb-access {
-  bottom: var(--space-xl);
-  left: var(--space-xl);
-}
-
-.orb-language {
-  bottom: var(--space-xl);
-  left: calc(var(--space-xl) + 56px);
-}
-
-/* -------------------- Responsive -------------------- */
+/* === FEATURE: Responsive (feature-specific only) === */
 @media (max-width: 640px) {
-  .menu-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-sm);
-    padding: var(--space-md);
-  }
-
-  .menu-tile {
-    padding: var(--space-md) var(--space-sm);
-  }
-
-  .menu-tile .tile-icon {
-    font-size: 1.5rem;
-  }
-
-  .menu-tile .tile-label {
-    font-size: 0.6875rem;
-  }
-
-  .section-container {
-    padding: var(--space-md);
-  }
-
-  .login-card {
-    padding: var(--space-md);
-  }
+  .menu-grid { grid-template-columns: repeat(3, 1fr); }
+  .menu-tile { padding: 1rem 0.5rem; }
 }
-
 @media (max-width: 380px) {
-  .menu-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* -------------------- Reduced Motion -------------------- */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-
-  .backdrop-layer img,
-  .backdrop-layer video {
-    transition: none;
-  }
-}
-
-/* -------------------- High Contrast -------------------- */
-@media (prefers-contrast: high) {
-  :root {
-    --glass-bg: rgba(0, 0, 0, 0.95);
-    --glass-border: rgba(255, 255, 255, 0.5);
-    --ntcc-text: #ffffff;
-    --ntcc-text-muted: #cccccc;
-  }
+  .menu-grid { grid-template-columns: repeat(2, 1fr); }
 }
