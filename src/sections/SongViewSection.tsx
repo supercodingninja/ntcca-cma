@@ -1,3 +1,6 @@
+// Copyright © 2026 Reverend Frederick D. Thomas, Jr. — All Rights Reserved.
+// Unauthorized use is strictly prohibited.
+
 // ==========================================================================
 // This Area Of Code Is: The performance Song View.
 // Explanation: Renders chord-over-lyrics charts with live transposition
@@ -14,7 +17,7 @@ import { resolveFileUrl } from '../lib/fileStore';
 import { youtubeEmbed, isVideoFile } from '../lib/media';
 import { ATTACHMENT_ICON } from '../lib/attachments';
 import type { SongAttachment } from '../lib/music';
-import PdfView from '../components/PdfView';
+import PdfViewer from '../components/PdfViewer';
 import EngravedSheet from '../components/EngravedSheet';
 import { ListenPanel } from './ListenPanel';
 import { useI18n } from '../lib/i18n';
@@ -117,7 +120,7 @@ export default function SongViewSection({ song, onSection, onOpenSong }: Props) 
         </div>
         {a.kind === 'audio' && url && <audio controls preload="metadata" src={url} className="w-full mt-2" />}
         {a.kind === 'video' && url && <video controls playsInline preload="metadata" src={url} className="w-full aspect-video bg-black rounded-lg mt-2" />}
-        {a.kind === 'pdf' && url && openPdf === a.id && <PdfView url={url} name={a.name} />}
+        {a.kind === 'pdf' && url && openPdf === a.id && <PdfViewer url={url} name={a.name} />}
       </div>
     );
   };
@@ -272,7 +275,8 @@ export default function SongViewSection({ song, onSection, onOpenSong }: Props) 
           <button className="glass-btn text-sm" onClick={() => setEngraving(true)}>
             🖨 Engrave
           </button>
-          <button className={`glass-btn text-sm ${scrolling ? 'danger' : ''}`} onClick={() => setScrolling(!scrolling)}>            {scrolling ? `⏸ ${t('stop')}` : `▶ ${t('autoScroll')}`}
+          <button className={`glass-btn text-sm ${scrolling ? 'danger' : ''}`} onClick={() => setScrolling(!scrolling)}>
+            {scrolling ? `⏸ ${t('stop')}` : `▶ ${t('autoScroll')}`}
           </button>
           <label className="text-sm text-muted flex items-center gap-2">
             {t('speed')}
