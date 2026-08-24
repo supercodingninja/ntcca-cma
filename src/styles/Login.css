@@ -1,0 +1,156 @@
+/* Copyright © 2026 Reverend Frederick D. Thomas, Jr. — All Rights Reserved. */
+/* Unauthorized use is strictly prohibited. */
+
+/* ==========================================================================
+   LOGIN PAGE STYLES
+   Explanation: Everything specific to the "Welcome Back!" screen — church
+   picker, role selector, demo logins, language orb, and selected church info.
+   In Other Words: The front door's paint job.
+   ========================================================================== */
+
+.login-screen {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+/* === Login Card === */
+.login-card {
+  position: relative;
+  z-index: var(--z-content);
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+}
+
+.glass-card-solid {
+  background: var(--glass-bg-solid);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 2rem;
+}
+
+/* === Brand === */
+.brand {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 1.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ntcc-gold);
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 0.9375rem;
+  color: var(--ntcc-text-muted);
+  margin-bottom: 2rem;
+}
+
+/* === Form Fields === */
+.login-screen label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ntcc-text-muted);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.church-select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: var(--glass-bg-solid);
+  border: 1px solid var(--glass-border);
+  color: var(--ntcc-text);
+  font-size: 0.9375rem;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%239a9894' viewBox='0 0 16 16'%3E%3Cpath d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2.5rem;
+}
+
+.church-select:focus {
+  outline: none;
+  border-color: var(--ntcc-gold);
+}
+
+.church-select option {
+  background: var(--ntcc-dark-surface);
+  color: var(--ntcc-text);
+}
+
+/* === Demo Section === */
+.demo-section {
+  text-align: center;
+}
+
+.demo-label {
+  font-size: 0.8125rem;
+  color: var(--ntcc-text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.demo-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+/* === Selected Church Info === */
+.church-info {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--glass-border);
+  font-size: 0.8125rem;
+  color: var(--ntcc-text-muted);
+}
+
+.church-info-name {
+  font-weight: 600;
+  color: var(--ntcc-gold);
+}
+
+.church-info-link {
+  color: var(--ntcc-gold);
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 0.25rem;
+}
+
+.church-info-link:hover {
+  text-decoration: underline;
+}
+
+/* === Language Orb === */
+.orb-language {
+  bottom: 1.5rem;
+  left: 1.5rem;
+}
+
+/* === Responsive === */
+@media (max-width: 480px) {
+  .login-screen {
+    padding: 1rem;
+    align-items: flex-start;
+    padding-top: 3rem;
+  }
+
+  .glass-card-solid {
+    padding: 1.5rem;
+  }
+
+  .brand {
+    font-size: 1.5rem;
+  }
+}
