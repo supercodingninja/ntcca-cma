@@ -1,0 +1,197 @@
+/* Copyright © 2026 Reverend Frederick D. Thomas, Jr. — All Rights Reserved. */
+/* Unauthorized use is strictly prohibited. */
+
+/* ==========================================================================
+   HOME PAGE / APP SHELL STYLES
+   Explanation: Navigation rail, header, menu overlay panel, footer, and the
+   viewport handshake layout. Everything specific to the signed-in shell.
+   In Other Words: The frame that holds every section.
+   ========================================================================== */
+
+/* === NAVIGATION === */
+.nav-shell {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Collapsed nav buttons stay in DOM for measurement but are invisible */
+.nav-collapsed {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
+.nav-orbs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.nav-orb-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.nav-orb-btn:hover {
+  transform: scale(1.08);
+}
+
+/* === MORE FAB === */
+.nav-menu-fab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(212, 168, 67, 0.15);
+  border: 1px solid rgba(212, 168, 67, 0.3);
+  color: var(--ntcc-gold);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.nav-menu-fab:hover {
+  background: rgba(212, 168, 67, 0.25);
+  transform: translateY(-1px);
+}
+
+.nav-menu-word {
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 0.6875rem;
+}
+
+/* === AUTH INPUT (view-as-role dropdown) === */
+.auth-input {
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  background: var(--glass-bg-solid);
+  border: 1px solid var(--glass-border);
+  color: var(--ntcc-text);
+  font-size: 0.8125rem;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239a9894' viewBox='0 0 16 16'%3E%3Cpath d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  padding-right: 1.75rem;
+  cursor: pointer;
+}
+
+.auth-input:focus {
+  outline: none;
+  border-color: var(--ntcc-gold);
+}
+
+/* === MENU OVERLAY PANEL === */
+.menu-panel {
+  position: relative;
+  z-index: var(--z-menu);
+  max-width: 640px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+}
+
+/* === UNIVERSAL ACCESS HEADER === */
+.ua-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.ua-title {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--ntcc-gold);
+  letter-spacing: 0.02em;
+  text-align: center;
+  flex: 1;
+}
+
+/* === TILE ICON === */
+.tile-icon {
+  display: block;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* === CLOSE BUTTON === */
+.ua-close {
+  display: block;
+  width: 100%;
+  margin-top: 1.5rem;
+  padding: 0.75rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--glass-border);
+  color: var(--ntcc-text-muted);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ua-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--ntcc-text);
+}
+
+/* === FOOTER === */
+.app-copyright {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  font-size: 0.6875rem;
+  color: var(--ntcc-text-dim);
+  background: rgba(10, 10, 15, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid var(--glass-border);
+  z-index: var(--z-content);
+}
+
+.app-copyright.hidden {
+  display: none;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 640px) {
+  .menu-panel {
+    margin: 1rem;
+    padding: 1rem;
+    max-height: calc(100vh - 2rem);
+  }
+
+  .ua-title {
+    font-size: 1rem;
+  }
+
+  .nav-shell {
+    gap: 0.25rem;
+  }
+}
