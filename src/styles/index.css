@@ -1,0 +1,214 @@
+/* Copyright © 2026 Reverend Frederick D. Thomas, Jr. — All Rights Reserved. */
+/* Unauthorized use is strictly prohibited. */
+
+/* ==========================================================================
+   TAILWIND DIRECTIVES — REQUIRED. Must come before any custom @layer rules.
+   ========================================================================== */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   This Area Of Code Is: The CSS Shell — tokens, reset, backdrop skeleton,
+   scroll behavior, and accessibility guards.
+   Explanation: This file is the UNBREAKABLE foundation. It contains ONLY
+   the rules the app needs to exist: custom properties, base reset, body
+   transparency for the photo backdrop, scrollbar styling, and accessibility
+   media queries. NO component styles, NO feature animations, NO page layouts.
+   In Other Words: The concrete foundation of the sanctuary — you paint the
+   walls in App.css and the rooms in their own files, but this slab never moves.
+   ========================================================================== */
+
+/* -------------------- CSS Custom Properties (Tokens) -------------------- */
+:root {
+  /* The NTCC palette — gold on dark, like the sanctuary */
+  --ntcc-gold: #d4a843;
+  --ntcc-gold-light: #f0d78c;
+  --ntcc-gold-dark: #a67c2e;
+  --ntcc-dark: #0a0a0f;
+  --ntcc-dark-elevated: #12121a;
+  --ntcc-dark-surface: #1a1a24;
+  --ntcc-dark-panel: #22222e;
+  --ntcc-text: #e8e6e1;
+  --ntcc-text-muted: #9a9894;
+  --ntcc-text-dim: #6a6864;
+  --ntcc-danger: #c44;
+  --ntcc-success: #4a4;
+
+  /* Glass morphism tokens */
+  --glass-bg: rgba(18, 18, 26, 0.92);
+  --glass-bg-solid: rgba(18, 18, 26, 0.98);
+  --glass-bg-strong: rgba(18, 18, 26, 0.95);
+  --glass-border: rgba(212, 168, 67, 0.15);
+  --glass-border-strong: rgba(212, 168, 67, 0.35);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+
+  /* Spacing scale */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "SF Mono", Monaco, "Cascadia Code", monospace;
+
+  /* Z-index stack — explicit layers, no guessing */
+  --z-backdrop: -1;
+  --z-content: 10;
+  --z-header: 100;
+  --z-menu: 200;
+  --z-menu-overlay: 250;
+  --z-modal: 300;
+  --z-toast: 400;
+  --z-orb: 500;
+}
+
+/* -------------------- Base Reset -------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  background: var(--ntcc-dark);
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Body is TRANSPARENT so Backdrop.tsx photos show through on every screen */
+body {
+  font-family: var(--font-sans);
+  background: transparent;
+  color: var(--ntcc-text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.5;
+}
+
+/* Body scroll lock — when menu opens, the page behind freezes */
+body.menu-locked {
+  overflow: hidden;
+  touch-action: none;
+}
+
+/* -------------------- Backdrop Skeleton (positioning only) -------------------- */
+.backdrop-layer {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-backdrop);
+  overflow: hidden;
+}
+
+.backdrop-layer img,
+.backdrop-layer video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The dark vignette that keeps text readable over photos */
+.backdrop-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 20%, transparent 0%, rgba(10,10,15,0.4) 60%, rgba(10,10,15,0.85) 100%),
+    linear-gradient(to bottom, rgba(10,10,15,0.3) 0%, transparent 30%, transparent 70%, rgba(10,10,15,0.6) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* -------------------- App Root Shell -------------------- */
+#root {
+  position: relative;
+  z-index: var(--z-content);
+  min-height: 100vh;
+}
+
+.app-shell {
+  position: relative;
+  z-index: var(--z-content);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* -------------------- Global Utility Classes (used everywhere) -------------------- */
+.font-display {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.text-accent {
+  color: var(--ntcc-gold);
+}
+
+.text-muted {
+  color: var(--ntcc-text-muted);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* -------------------- Scrollbars -------------------- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(212, 168, 67, 0.25);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 168, 67, 0.4);
+}
+
+/* -------------------- Accessibility Guards (never break layout) -------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .backdrop-layer img,
+  .backdrop-layer video {
+    transition: none;
+  }
+}
+
+@media (prefers-contrast: high) {
+  :root {
+    --glass-bg: rgba(0, 0, 0, 0.95);
+    --glass-border: rgba(212, 168, 67, 0.5);
+    --ntcc-text: #ffffff;
+    --ntcc-text-muted: #cccccc;
+  }
+}
