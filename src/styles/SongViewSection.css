@@ -1,0 +1,139 @@
+/* Copyright © 2026 Reverend Frederick D. Thomas, Jr. — All Rights Reserved. */
+/* Unauthorized use is strictly prohibited. */
+
+/* ==========================================================================
+   SONG VIEW SECTION STYLES
+   Explanation: The performance chord chart, transposition controls,
+   instrument parts, auto-scroll, attachments, PDF viewer, and engraving.
+   In Other Words: The sheet music and all its controls.
+   ========================================================================== */
+
+/* === Service Badge (theme tags) === */
+.service-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* === Pill (attachment labels) === */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(212, 168, 67, 0.1);
+  border: 1px solid rgba(212, 168, 67, 0.2);
+  color: var(--ntcc-gold);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* === Band Parts (instrument transposer row) === */
+.band-parts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--glass-border);
+}
+
+.band-parts-label {
+  font-size: 0.8125rem;
+  color: var(--ntcc-text-muted);
+  margin-right: 0.5rem;
+}
+
+.band-part {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.375rem 0.625rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 3.5rem;
+}
+
+.band-part:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--glass-border-strong);
+}
+
+.band-part.on {
+  background: rgba(212, 168, 67, 0.12);
+  border-color: var(--ntcc-gold);
+}
+
+.band-part-name {
+  font-size: 0.6875rem;
+  color: var(--ntcc-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.band-part-key {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--ntcc-text);
+}
+
+.band-part.on .band-part-key {
+  color: var(--ntcc-gold);
+}
+
+/* === Chord Chart === */
+.song-scroll {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.chord-line {
+  font-size: 1.125rem;
+  line-height: 1.8;
+  margin-bottom: 0.75rem;
+}
+
+.chord-word {
+  display: inline-block;
+  margin-right: 0.375rem;
+}
+
+.chord {
+  display: block;
+  font-weight: 700;
+  color: var(--ntcc-gold);
+  font-size: 0.875rem;
+  line-height: 1.2;
+  min-height: 1.2em;
+}
+
+.lyric {
+  display: block;
+  color: var(--ntcc-text);
+}
+
+/* === Responsive === */
+@media (max-width: 640px) {
+  .chord-line {
+    font-size: 1rem;
+  }
+
+  .band-parts {
+    gap: 0.375rem;
+  }
+
+  .band-part {
+    min-width: 3rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
