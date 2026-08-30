@@ -1,4 +1,4 @@
-// Copyright © 2026 Reverend Frederick D. Thomas, Jr. — All Rights Reserved.
+// Copyright © 2026 NTCCA Music App™ | Gifted to New Testament Christian Churches of America, INC. by Reverend Frederick D. Thomas, Jr., NTCC Graham, WA | Class of 2011, Commissioned Change Your World
 // Unauthorized use is strictly prohibited.
 
 // ==========================================================================
@@ -18,6 +18,7 @@ import { youtubeEmbed, isVideoFile } from '../lib/media';
 import { ATTACHMENT_ICON } from '../lib/attachments';
 import type { SongAttachment } from '../lib/music';
 import PdfViewer from '../components/PdfViewer';
+import SibViewer from '../components/SibViewer';
 import EngravedSheet from '../components/EngravedSheet';
 import { ListenPanel } from './ListenPanel';
 import { useI18n } from '../lib/i18n';
@@ -99,6 +100,21 @@ export default function SongViewSection({ song, onSection, onOpenSong }: Props) 
 
   const renderAttachment = (a: SongAttachment) => {
     const url = attUrls[a.id];
+
+    // Sibelius .sib file viewer — renders the score inline
+    if (a.name?.toLowerCase().endsWith('.sib')) {
+      return (
+        <div key={a.id} className="glass-card p-3">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">{ATTACHMENT_ICON[a.kind]}</span>
+            <span className="flex-1 truncate text-sm">{a.name}</span>
+            <span className="pill text-xs">Sibelius score</span>
+          </div>
+          <SibViewer fileUrl={url ?? a.ref} fileName={a.name} />
+        </div>
+      );
+    }
+
     return (
       <div key={a.id} className="glass-card p-3">
         <div className="flex items-center gap-2">
