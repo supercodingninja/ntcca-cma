@@ -1,0 +1,218 @@
+/* Copyright © 2026 NTCCA Music App™ — All Rights Reserved. */
+/* Gifted to New Testament Christian Churches of America, INC. */
+/* by Reverend Frederick D. Thomas, Jr., NTCC Graham, WA */
+/* | Class of 2011, Commissioned Change Your World */
+/* Unauthorized use is strictly prohibited. */
+
+.sib-viewer {
+  background: linear-gradient(145deg, rgba(26, 26, 46, 0.9), rgba(15, 15, 26, 0.95));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 1.5rem;
+  max-width: 640px;
+  margin: 0 auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.sib-viewer::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+}
+
+.sib-viewer--loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  gap: 1rem;
+}
+
+.sib-viewer-spinner {
+  width: 40px; height: 40px;
+  border: 3px solid rgba(212, 175, 55, 0.15);
+  border-top-color: #d4af37;
+  border-radius: 50%;
+  animation: sibSpin 0.8s linear infinite;
+}
+
+@keyframes sibSpin { to { transform: rotate(360deg); } }
+
+.sib-viewer-loading-text { color: rgba(255,255,255,0.6); font-size: 0.95rem; margin: 0; }
+
+.sib-viewer--error { text-align: center; color: #f87171; padding: 2rem; }
+.sib-viewer--error p { margin-top: 0.75rem; color: rgba(255,255,255,0.7); }
+
+.sib-viewer-header {
+  display: flex; align-items: center; gap: 1rem;
+  margin-bottom: 1.25rem; padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.sib-viewer-icon {
+  width: 48px; height: 48px; border-radius: 14px;
+  background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05));
+  border: 1px solid rgba(212,175,55,0.2);
+  display: flex; align-items: center; justify-content: center;
+  color: #d4af37; flex-shrink: 0;
+}
+
+.sib-viewer-meta { flex: 1; min-width: 0; }
+
+.sib-viewer-filename { font-size: 1.1rem; font-weight: 700; color: #fff; margin: 0; line-height: 1.3; word-break: break-word; }
+.sib-viewer-version { font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-top: 0.25rem; display: block; }
+
+.sib-viewer-download {
+  width: 40px; height: 40px; border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.6);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s ease; flex-shrink: 0;
+}
+
+.sib-viewer-download:hover {
+  background: rgba(212,175,55,0.15); color: #d4af37;
+  border-color: rgba(212,175,55,0.3);
+}
+
+.sib-viewer-banner {
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.75rem 1rem; border-radius: 12px;
+  margin-bottom: 1rem; font-size: 0.9rem; font-weight: 500;
+}
+
+.sib-viewer-banner--success { background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.15); color: #4ade80; }
+.sib-viewer-banner--warning { background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.15); color: #fbbf24; }
+
+.sib-viewer-metadata {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 14px; padding: 1rem; margin-bottom: 1rem;
+}
+
+.sib-viewer-field {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.sib-viewer-field:last-child { border-bottom: none; padding-bottom: 0; }
+.sib-viewer-field:first-child { padding-top: 0; }
+
+.sib-viewer-label { font-size: 0.8rem; color: rgba(255,255,255,0.4); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+.sib-viewer-value { font-size: 0.9rem; color: rgba(255,255,255,0.85); font-weight: 600; text-align: right; max-width: 60%; word-break: break-word; }
+
+.sib-viewer-notes { margin-bottom: 1rem; }
+.sib-viewer-notes-title { font-size: 0.95rem; font-weight: 700; color: #d4af37; margin-bottom: 0.75rem; }
+
+.sib-viewer-notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+  gap: 0.5rem;
+}
+
+.sib-viewer-note-chip {
+  padding: 0.6rem;
+  background: rgba(212,175,55,0.08);
+  border: 1px solid rgba(212,175,55,0.15);
+  border-radius: 10px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #d4af37;
+  font-weight: 600;
+}
+
+.sib-viewer-note-octave { font-size: 0.7rem; color: rgba(212,175,55,0.5); font-weight: 400; }
+
+.sib-viewer-note-more {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+}
+
+.sib-viewer-warnings { margin-bottom: 1rem; }
+
+.sib-viewer-warning {
+  display: flex; align-items: flex-start; gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  background: rgba(251,191,36,0.05);
+  border: 1px solid rgba(251,191,36,0.1);
+  border-radius: 10px;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  color: rgba(251,191,36,0.9);
+  line-height: 1.5;
+}
+
+.sib-viewer-warning:last-child { margin-bottom: 0; }
+.sib-viewer-warning svg { flex-shrink: 0; margin-top: 2px; }
+
+.sib-viewer-strings { margin-bottom: 1rem; }
+
+.sib-viewer-strings-toggle {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  color: rgba(255,255,255,0.6);
+  font-size: 0.8rem; font-weight: 500;
+  cursor: pointer; transition: all 0.2s ease;
+}
+
+.sib-viewer-strings-toggle:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.8); }
+
+.sib-viewer-strings-list {
+  margin-top: 0.75rem; padding: 0.75rem;
+  background: rgba(0,0,0,0.2);
+  border-radius: 10px;
+  max-height: 200px; overflow-y: auto;
+  display: flex; flex-wrap: wrap; gap: 0.4rem;
+}
+
+.sib-viewer-string-item {
+  display: inline-block; padding: 0.25rem 0.5rem;
+  background: rgba(255,255,255,0.05);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.6);
+  font-family: 'Courier New', monospace;
+  word-break: break-all;
+}
+
+.sib-viewer-strings-more {
+  font-size: 0.75rem; color: rgba(255,255,255,0.3);
+  width: 100%; text-align: center; padding: 0.5rem 0;
+}
+
+.sib-viewer-tip {
+  display: flex; align-items: flex-start; gap: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(212,175,55,0.05);
+  border: 1px solid rgba(212,175,55,0.1);
+  border-radius: 12px;
+  font-size: 0.85rem;
+  color: rgba(212,175,55,0.8);
+  line-height: 1.5;
+}
+
+.sib-viewer-tip svg { flex-shrink: 0; margin-top: 2px; color: #d4af37; }
+
+@media (max-width: 640px) {
+  .sib-viewer { padding: 1.25rem; border-radius: 16px; }
+  .sib-viewer-header { gap: 0.75rem; }
+  .sib-viewer-filename { font-size: 1rem; }
+  .sib-viewer-notes-grid { grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); }
+}
