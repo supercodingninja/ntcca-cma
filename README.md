@@ -154,7 +154,6 @@ The `SibViewer` displays:
 - **🎧 The Ear** — On-device audio recognition engine (no cloud)
 - **📎 Multi-Format Attachments** — PDF, MusicXML, `.sib`, audio, video per song
 - **🎼 Part Picker** — Each musician views only their staff (SATB, band, orchestra)
-- **🔒 SCN TrustShield™ + SCN Ledger™** — Token-only verification, no personal data stored, CPA-ready financial reporting
 - **♿ ADA/WCAG Compliant** — Screen-reader-ready policy modals, plain-language summaries
 
 ---
@@ -181,9 +180,9 @@ npm run deploy
 
 - **Nonprofit Religious Educational Purpose** — Operated under good-faith use
 - **No Reverse Engineering** — `.sib` parser uses heuristic scanning only; full format decoding is not pursued
-- **CCLI Compliance** — Federal-compliant credits: original artist, label, publisher, CCLI number
-- **SCN Commerce Policy** — All physical merchandise sales FINAL; digital refundable 48hrs if never downloaded
-- **Privacy** — No personal data stored; Stripe token-only verification; 3-download limit per purchase
+- **CCLI Compliance** — Federal-compliant credits: original artist, label, publisher, CCLI number; link to buy/stream the original
+- **Privacy** — No personal data stored; token-only verification; 3-download limit per purchase
+- **Accessibility** — Screen-reader-ready policy modal; plain-language summary; scroll-to-unlock; unchecked checkbox + typed initials; record only token+timestamp+policy version
 
 ---
 
