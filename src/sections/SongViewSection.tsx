@@ -19,6 +19,7 @@ import { ATTACHMENT_ICON } from '../lib/attachments';
 import type { SongAttachment } from '../lib/music';
 import PdfViewer from '../components/PdfViewer';
 import SibViewer from '../components/SibViewer';
+import UnifiedViewer from '../components/UnifiedViewer';
 import EngravedSheet from '../components/EngravedSheet';
 import { ListenPanel } from './ListenPanel';
 import { useI18n } from '../lib/i18n';
@@ -100,9 +101,24 @@ export default function SongViewSection({ song, onSection, onOpenSong }: Props) 
 
   const renderAttachment = (a: SongAttachment) => {
     const url = attUrls[a.id];
+    const lowerName = a.name?.toLowerCase() ?? '';
+
+    // MusicXML / XML — full notation renderer
+    if (lowerName.endsWith('.musicxml') || lowerName.endsWith('.xml')) {
+      return (
+        <div key={a.id} className="glass-card p-3">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">{ATTACHMENT_ICON[a.kind]}</span>
+            <span className="flex-1 truncate text-sm">{a.name}</span>
+            <span className="pill text-xs">MusicXML score</span>
+          </div>
+          <UnifiedViewer fileUrl={url ?? a.ref} fileName={a.name} />
+        </div>
+      );
+    }
 
     // Sibelius .sib file viewer — renders the score inline
-    if (a.name?.toLowerCase().endsWith('.sib')) {
+    if (lowerName.endsWith('.sib')) {
       return (
         <div key={a.id} className="glass-card p-3">
           <div className="flex items-center gap-2">
